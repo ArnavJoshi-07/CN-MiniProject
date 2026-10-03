@@ -1,2 +1,4 @@
 logs/
 ryu-env/
+CLAUDE.md
+__pycache__/
