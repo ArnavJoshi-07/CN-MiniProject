@@ -15,7 +15,7 @@ at least one telemetry reading triggers a flow-rule change.
 | 3. Custom Ryu app with UDP listener | ✅ Written, tested with fake packets, running in Mininet |
 | 4. Port stats polling + utilization | ✅ Written, unit-tested, verified in Mininet with iperf |
 | 5. Heartbeat checker | ✅ Written, unit-tested, verified in Mininet (kill / restart h5's agent) |
-| 6. Static threshold alerts | ⬜ |
+| 6. Static threshold alerts | 🔄 Written, unit-tested; CRITICAL seen in Mininet, RESOLVED still to confirm |
 | 7. Correlation + mitigation flow rule | ⬜ |
 | 8. README update | 🔄 README.md brought up to date (diagram, topology, run steps, heartbeat test); test-case table still to do |
 
@@ -347,7 +347,100 @@ Two Mininet traps in these commands (both now in the README):
 
 ---
 
-## 7. Documentation
+## 7. Utilization alerts (`controller/monitor_app.py`), Task 6
+
+No new thread: every port stats reply is now also checked against static
+thresholds, and the alert helpers from Task 5 got a cooldown.
+
+### How it works
+
+- **Thresholds** (`UTIL_THRESHOLDS`): WARNING from 70 %, CRITICAL from 90 %.
+  `util_severity(util)` returns the highest one reached, or `None`.
+- **Check** (`_check_util`, called at the end of `_update_port` once a port has a
+  utilization): raises or resolves one alert per link direction, named after the
+  direction, e.g. `utilization s1->s3`:
+  - every port's **tx** is judged, as the direction from that switch to its peer;
+  - a port whose peer is a host or the monitor also has its **rx** judged, as the
+    direction from the peer to the switch (`h1->s4`, `monitor->s1`).
+- **Cooldown** (`ALERT_COOLDOWN = {"utilization": 10}`): each active alert now
+  remembers when it last saw each severity (`"seen"`). The checkers call
+  `_raise_alert` on every check that finds the problem, which is what keeps
+  `"seen"` up to date.
+  - New alert or higher severity → logged at once.
+  - Lower severity → logged only once nothing higher has been seen for 10 s.
+  - Problem gone → `RESOLVED` only once no severity has been seen for 10 s.
+  - Same severity again → nothing (de-duplication, as before).
+  - Kinds not in `ALERT_COOLDOWN` (`unreachable`) behave exactly as in Task 5.
+- Example log for iperf h1 → h10:
+  ```
+  ALERT CRITICAL utilization s1->s3: s1-eth2 tx 96.5% of 10 Mbit/s (9.65 Mbit/s)
+  ALERT RESOLVED utilization s1->s3: s1-eth2 tx 0.1% of 10 Mbit/s (0.01 Mbit/s), under 70% for 10 s (alert lasted 34 s)
+  ```
+
+### Decisions and why
+
+- **One alert per link direction, judged at the sending port.** On a link between
+  two switches, s1-eth2 tx and s3-eth3 rx count the same s1 → s3 traffic. Alerting
+  per port would report the full bottleneck twice. Using the sender's tx gives every
+  switch-to-switch direction exactly one judge. Hosts and the monitor have no
+  OpenFlow counters, so their outgoing direction can only be read as the switch's rx.
+- **Per direction, not per link.** The two directions have separate queues: during
+  iperf h1 → h10, s1 → s3 is full while s3 → s1 is nearly idle (that is why telemetry
+  from h7–h12 still arrives). One alert per link would hide which way is congested.
+- **Cooldown as a hold-down on lowering, not a pause before raising again.** The
+  other common meaning, "after RESOLVED, don't raise the same alert for N s", still
+  raises and resolves a hovering link every N s, and it hides a real overload that
+  starts during the pause. Here a hovering link keeps one alert open, and getting
+  worse is never delayed. The price: `RESOLVED` comes 10 s after the link calms down.
+- **"Seen" per severity, not one "calm since" timer.** With a single timer,
+  95 % → 80 % for 8 s → 0 % would resolve immediately on the first 0 % sample (the
+  link had been "below CRITICAL" for 10 s), even though it was still above 70 % 2 s
+  earlier. Keeping the last time of each severity makes lowering and resolving each
+  wait 10 s after the last reading that justified the higher state.
+- **The cooldown is per kind.** `unreachable` resolves on the first fresh check: a
+  message arriving is a fact, not a noisy measurement.
+- **Known gap:** if Mininet exits while an alert is active, that alert stays open
+  (no more stats arrive to calm it) until the switches reconnect and report 10 s of
+  low traffic. The `alert lasted` time then includes the downtime.
+
+### Tests
+
+Unit test with a fake clock and fake port stats replies (the real `_update_port`,
+`_check_util`, alert helpers and `logs/topology.json`, no Ryu threads), all passed:
+
+| Case | Result |
+|---|---|
+| Idle links | No alerts |
+| Bottleneck at 96.5 % on s1-eth2 tx and s3-eth3 rx, 5 rounds | One `CRITICAL s1->s3`, no second alert for the rx end, no repeats |
+| Back to 0 % | `RESOLVED` exactly 10 s after the last busy sample |
+| 75 % then 95 % | WARNING, then CRITICAL 2 s later (escalation not delayed) |
+| CRITICAL, then 80 % for 12 s | Lowered to WARNING after 10 s |
+| Hovering 68 % / 72 % for 40 s | Nothing logged: one WARNING stays open |
+| 95 %, 80 % once, then 0 % | `RESOLVED` 10 s after the 80 % sample, no WARNING line in between |
+| WARNING, one 91 % spike | CRITICAL at once, back to WARNING 10 s later |
+| s4-eth1 rx 80 %, s1-eth3 rx 95 %, s4-eth1 tx 92 % | WARNING `h1->s4`, CRITICAL `monitor->s1`, CRITICAL `s4->h1` |
+| s3-eth3 rx 96 % alone (switch-to-switch rx) | No alert |
+| Heartbeat after the change | `unreachable` still resolves on the first fresh check |
+
+The app still imports under `ryu-env` (Python 3.9).
+
+### Verification in Mininet
+
+🔄 Partly done. With the controller restarted (Mininet kept running; the switches
+reconnected) and iperf h1 → h10 as in README.md, the controller logged
+```
+ALERT CRITICAL utilization s1->s3: s1-eth2 tx 93.9% of 10 Mbit/s (9.39 Mbit/s)
+```
+✅ The alert is logged once, by the first sample at or above 90 %. That sample
+covers TCP's ramp-up, so it reads below the steady 96.5 %. The steady samples have
+the same severity and are not logged again.
+
+Still to confirm: no alert for any other link, and `ALERT RESOLVED utilization
+s1->s3` about 10 s after iperf ends.
+
+---
+
+## 8. Documentation
 
 - **README.md** brought up to date: new architecture diagram with the tree and the
   monitor node, topology section (capacities, port map, `topology.json`), actual
@@ -360,8 +453,7 @@ Two Mininet traps in these commands (both now in the README):
 
 ## Next steps
 
-1. Task 6: utilization alerts at 70 % / 90 % with de-duplication and cooldown,
-   using `_raise_alert` / `_resolve_alert`.
+1. Task 6: confirm `RESOLVED` (and no other link alerting) in Mininet with iperf h1 → h10.
 2. Task 7: correlation (high rx on a host's port + low `app_tx_bytes` rate) → allow
    telemetry, drop everything else from that port, `hard_timeout=30`. Test with
    `hping3 --flood` from h1.
