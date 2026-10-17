@@ -45,6 +45,17 @@ it runs three green threads.
     ALERT CRITICAL unreachable h5: no telemetry for 6.4 s (3 intervals missed), last seq 57
     ALERT RESOLVED unreachable h5: telemetry is back (seq 1) (alert lasted 21 s)
 
+Utilization alerts need no thread of their own: every port stats reply is
+checked against static thresholds, WARNING from 70 % and CRITICAL from 90 %,
+once per link direction ("s1->s3"):
+
+    ALERT CRITICAL utilization s1->s3: s1-eth2 tx 96.5% of 10 Mbit/s (9.65 Mbit/s)
+    ALERT RESOLVED utilization s1->s3: s1-eth2 tx 0.1% of 10 Mbit/s (0.01 Mbit/s), under 70% for 10 s (alert lasted 34 s)
+
+A higher severity is logged at once. A lower one, or RESOLVED, only after the
+link has stayed below the active severity for 10 s (the cooldown), so a link
+hovering around a threshold doesn't log a new line every 2 s.
+
 Run (from the project root, inside ryu-env):
     ryu-manager --ofp-tcp-listen-port 6653 controller/monitor_app.py
 """
@@ -83,8 +94,19 @@ TELEMETRY_INTERVAL = 2     # seconds between agent messages (--interval in topol
 MISSED_LIMIT = 3           # intervals without telemetry before a node is unreachable
 HEARTBEAT_CHECK = 1        # seconds between heartbeat checks
 
-# Alert severity -> logging level of its log line.
+# Link utilization (%) at which an alert is raised, most severe first.
+UTIL_THRESHOLDS = (("CRITICAL", 90.0), ("WARNING", 70.0))
+
+# Alert severity -> logging level of its log line. Logging levels are
+# ordered (WARNING 30 < CRITICAL 50), so they also tell which is more severe.
 ALERT_LEVELS = {"WARNING": logging.WARNING, "CRITICAL": logging.CRITICAL}
+
+# Alert kind -> cooldown in seconds: how long its problem must stay below the
+# active severity before the alert is lowered or resolved. Utilization is
+# measured every 2 s and is noisy, so without it a link hovering around 70 %
+# would be raised and resolved over and over. Kinds not listed resolve at
+# once: for "unreachable", a message arriving is not noise.
+ALERT_COOLDOWN = {"utilization": 10}
 
 
 def parse_telemetry(data):
@@ -118,6 +140,14 @@ def loss_pct(state):
     return 100.0 * state["lost"] / total if total else 0.0
 
 
+def util_severity(util):
+    """Severity of the highest threshold util (%) reaches, or None."""
+    for severity, threshold in UTIL_THRESHOLDS:
+        if util >= threshold:
+            return severity
+    return None
+
+
 class MonitorApp(SimpleSwitch13):
     """simple_switch_13 forwarding + telemetry tracking + port utilization."""
 
@@ -136,8 +166,10 @@ class MonitorApp(SimpleSwitch13):
         self.port_stats = {}     # (dpid, port) -> state dict (see docstring)
         self.unknown_ports = set()   # ports with no capacity, already warned
 
-        # (kind, subject) -> {"severity": "CRITICAL", "since": monotonic time}
-        # for every alert active now, e.g. ("unreachable", "h5"). Kept apart
+        # (kind, subject) -> {"severity": "CRITICAL", "since": monotonic time,
+        #                     "seen": {"WARNING": t, "CRITICAL": t}}
+        # for every alert active now, e.g. ("unreachable", "h5"). "seen" is
+        # when each severity was last reported, for the cooldown. Kept apart
         # from self.nodes: an agent restart replaces its node state, and that
         # must not make the alert forget it was raised.
         self.alerts = {}
@@ -240,32 +272,57 @@ class MonitorApp(SimpleSwitch13):
     # --- Alerts ------------------------------------------------------------
 
     def _raise_alert(self, kind, subject, severity, text):
-        """Log an alert once. Repeats are ignored until it is resolved.
+        """Report that a problem is present now, at this severity.
 
-        kind + subject name the problem ("unreachable", "h5"). Raising it
-        again with a different severity is logged as a change, so a WARNING
-        can later turn into a CRITICAL (task 6).
+        kind + subject name the problem ("unreachable", "h5"). Checkers call
+        this on every check that finds the problem, not only the first, so
+        the alert knows when each severity was last seen. Logged:
+        - a new alert, or a higher severity than the active one: at once;
+        - a lower severity: once nothing higher has been seen for the kind's
+          cooldown (ALERT_COOLDOWN);
+        - the active severity again: never (de-duplication).
         """
         key = (kind, subject)
+        now = time.monotonic()
         active = self.alerts.get(key)
-        if active is not None and active["severity"] == severity:
-            return
         if active is None:
-            self.alerts[key] = {"severity": severity,
-                                "since": time.monotonic()}
+            self.alerts[key] = {"severity": severity, "since": now,
+                                "seen": {severity: now}}
         else:
+            active["seen"][severity] = now
+            if severity == active["severity"]:
+                return
+            if (ALERT_LEVELS[severity] < ALERT_LEVELS[active["severity"]]
+                    and not self._cooled_down(kind, active, severity, now)):
+                return
             active["severity"] = severity
         self.logger.log(ALERT_LEVELS[severity], "ALERT %-8s %s %s: %s",
                         severity, kind, subject, text)
 
     def _resolve_alert(self, kind, subject, text):
-        """Log that an alert is over. Does nothing if it isn't active."""
-        active = self.alerts.pop((kind, subject), None)
-        if active is None:
+        """Report that a problem is gone now.
+
+        The alert is resolved once no severity of it has been seen for the
+        kind's cooldown, so at once for kinds without one. Does nothing if
+        it isn't active.
+        """
+        key = (kind, subject)
+        now = time.monotonic()
+        active = self.alerts.get(key)
+        if active is None or not self._cooled_down(kind, active, None, now):
             return
+        del self.alerts[key]
         self.logger.info("ALERT RESOLVED %s %s: %s (alert lasted %.0f s)",
-                         kind, subject, text,
-                         time.monotonic() - active["since"])
+                         kind, subject, text, now - active["since"])
+
+    def _cooled_down(self, kind, active, severity, now):
+        """True if the alert has seen nothing more severe than `severity`
+        (None: nothing at all) for the kind's cooldown."""
+        floor = ALERT_LEVELS[severity] if severity else logging.NOTSET
+        # Never empty: the active severity is in "seen" and is above floor.
+        last = max(t for s, t in active["seen"].items()
+                   if ALERT_LEVELS[s] > floor)
+        return now - last >= ALERT_COOLDOWN.get(kind, 0)
 
     # --- Topology ----------------------------------------------------------
 
@@ -395,3 +452,35 @@ class MonitorApp(SimpleSwitch13):
                              self.port_peer.get(key, "?"), capacity / 1e6,
                              cur["rx_util"], cur["rx_bps"] / 1e6,
                              cur["tx_util"], cur["tx_bps"] / 1e6)
+        self._check_util(key, cur, capacity)
+
+    def _check_util(self, key, cur, capacity):
+        """Raise or resolve the utilization alerts of the link at this port.
+
+        Alerts are per link direction, named "s1->s3". A link between two
+        switches is measured at both ends (s1-eth2 tx and s3-eth3 rx count
+        the same s1 -> s3 traffic), so each direction is judged only where
+        it is sent, by tx; otherwise every busy link would be alerted twice.
+        Hosts and the monitor report no port stats, so on their links the
+        switch's rx is used too, for the direction towards the switch.
+        """
+        switch = self.switch_names.get(key[0], "dpid%d" % key[0])
+        peer = self.port_peer.get(key, "?")
+        directions = [("tx", switch, peer)]
+        if peer not in self.switch_names.values():
+            directions.append(("rx", peer, switch))
+
+        for d, src, dst in directions:
+            link = "%s->%s" % (src, dst)
+            util = cur[d + "_util"]
+            text = "%s %s %.1f%% of %.0f Mbit/s (%.2f Mbit/s)" % (
+                self._port_name(*key), d, util, capacity / 1e6,
+                cur[d + "_bps"] / 1e6)
+            severity = util_severity(util)
+            if severity:
+                self._raise_alert("utilization", link, severity, text)
+            else:
+                self._resolve_alert(
+                    "utilization", link, "%s, under %.0f%% for %d s" % (
+                        text, UTIL_THRESHOLDS[-1][1],
+                        ALERT_COOLDOWN["utilization"]))

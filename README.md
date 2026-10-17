@@ -7,7 +7,8 @@ and install flow rules in response.
 
 > **Status (17 Oct):** working on deliverable D1. The topology, agents,
 > telemetry receiver, link-utilization polling and heartbeat alerts are verified
-> in Mininet; next are utilization alerts and the mitigation rule. See [D1 progress](#d1-deliverable) and the work logs
+> in Mininet; utilization alerts are unit-tested and raise CRITICAL in Mininet
+> (RESOLVED still to confirm); next is the mitigation rule. See [D1 progress](#d1-deliverable) and the work logs
 > ([3 Oct](README2.md), [17 Oct](README3.md)).
 
 ---
@@ -37,7 +38,8 @@ and install flow rules in response.
         │  • telemetry listener: per-node seq, loss %, last seen   │
         │  • port stats every 2 s -> per-port link utilization     │
         │  • heartbeat checker: "unreachable" / "resolved" alerts  │
-        │  • next: utilization alerts, correlation, mitigation     │
+        │  • utilization alerts: WARNING 70 % / CRITICAL 90 %      │
+        │  • next: correlation, mitigation                         │
         └─────────────────────────────┬────────────────────────────┘
                                       │ after D1
                                       ▼
@@ -50,7 +52,7 @@ and install flow rules in response.
 |---|---|---|---|
 | Topology | `topology/` | System Python (sudo) | Mininet 3-tier tree: 7 switches, 12 hosts, monitor node, `TCLink` bandwidths. Writes `logs/topology.json` and starts the agents |
 | Telemetry agent | `agent/` | System Python inside each Mininet host | Sends CPU, memory and byte counters as JSON over UDP every 2 s |
-| Controller | `controller/` | `ryu-env` (Python 3.9) | Forwarding, telemetry receiver, port stats polling and utilization, heartbeat alerts; later utilization alerts, correlation, mitigation |
+| Controller | `controller/` | `ryu-env` (Python 3.9) | Forwarding, telemetry receiver, port stats polling and utilization, heartbeat and utilization alerts; later correlation, mitigation |
 | Dashboard | `dashboard/` | Own uv project (modern Python) | After D1: live view of nodes, link utilization, and alerts |
 | Server | `server/` | — | Unused for now (see [Design decisions](#design-decisions)) |
 
@@ -138,8 +140,8 @@ utilization % = (Δbytes × 8) / (Δt × link_capacity_bps) × 100
   `TCLink` shaper charges the headers of every real packet. On s1-eth2 the
   counter was 4.2 % below the shaper's byte count.
 
-**Static thresholds** (warning / critical). D1 implements link utilization and
-missed heartbeats (critical level only); the rest come later.
+**Static thresholds** (warning / critical). D1 implements link utilization
+(both levels) and missed heartbeats (critical level only); the rest come later.
 
 | Metric | Warning | Critical |
 |---|---|---|
@@ -168,10 +170,24 @@ Every alert is one log line starting with `ALERT`, so `grep ALERT` shows them al
 ```
 ALERT CRITICAL unreachable h5: no telemetry for 6.4 s (3 intervals missed), last seq 57
 ALERT RESOLVED unreachable h5: telemetry is back (seq 1) (alert lasted 21 s)
+ALERT CRITICAL utilization s1->s3: s1-eth2 tx 96.5% of 10 Mbit/s (9.65 Mbit/s)
+ALERT RESOLVED utilization s1->s3: s1-eth2 tx 0.1% of 10 Mbit/s (0.01 Mbit/s), under 70% for 10 s (alert lasted 34 s)
 ```
-An alert is identified by its kind and subject (`unreachable`, `h5`) and logged
-once while it is active (de-duplication); cooldown comes with the utilization
-alerts (task 6).
+- **Identity and de-duplication:** an alert is identified by its kind and
+  subject (`unreachable`, `h5`) and logged once while it is active. Only a
+  change of severity logs a new line.
+- **Utilization alerts are per link direction** (`s1->s3`), checked on every
+  port stats reply. A link between two switches is measured at both ends
+  (s1-eth2 tx and s3-eth3 rx count the same traffic), so each direction is
+  judged by the tx counter of the switch that sends it, and a busy link raises
+  one alert, not two. Hosts and the monitor have no port stats, so on their
+  links the switch's rx counter covers the direction towards the switch
+  (`h1->s4`).
+- **Cooldown:** a higher severity is logged at once. A utilization alert is
+  lowered (CRITICAL → WARNING) or resolved only after the link has stayed below
+  its severity for 10 s, so a link hovering around 70 % keeps one alert open
+  instead of raising and resolving it every 2 s. `unreachable` has no
+  cooldown: the first message from the node resolves it.
 
 ---
 
@@ -240,6 +256,12 @@ see [Link utilization](#how-monitoring-works) for why it isn't 100 %), the
 50 Mbit/s links on the path 19.3 %, h1's and h10's ports 9.6 %. The first and
 last rounds read lower because the transfer covers only part of those 2 s.
 
+Expected alerts: `ALERT CRITICAL utilization s1->s3` within one polling round of
+the start (possibly preceded by a WARNING if the first partial round lands
+between 70 and 90 %), nothing else while it runs, and `ALERT RESOLVED
+utilization s1->s3` about 10 s after iperf ends. No other link on the path
+crosses 70 %.
+
 > Mininet's built-in `iperf h1 h10` command hangs on this setup (Mininet 2.3.0 +
 > iperf 2.2.1), so run iperf manually as above. Type each command on its own
 > line: Mininet runs the whole line on the first host named and replaces other
@@ -275,7 +297,7 @@ telemetry with port stats; at least one telemetry-triggered flow-rule change.
 | 3 | Ryu app: learning switch + UDP telemetry listener, per-node seq/loss | ✅ Running in Mininet |
 | 4 | Port stats polling + utilization from `topology.json` | ✅ Verified in Mininet (bottleneck at 96.5 % during iperf h1 → h10) |
 | 5 | Heartbeat checker (unreachable / resolved) | ✅ Verified in Mininet (h5 agent killed → CRITICAL, restarted → RESOLVED) |
-| 6 | Static utilization alerts (70 / 90 %, de-dup + cooldown) | ⬜ |
+| 6 | Static utilization alerts (70 / 90 %, de-dup + cooldown) | 🔄 Unit-tested; in Mininet iperf h1 → h10 raised CRITICAL `s1->s3` (93.9 %), RESOLVED still to confirm |
 | 7 | Correlation + mitigation flow rules | ⬜ |
 | 8 | README: mitigation path in diagram, test-case table | ⬜ |
 
@@ -289,7 +311,7 @@ telemetry with port stats; at least one telemetry-triggered flow-rule change.
 | 4 | Agents on all hosts, per-node tracking, seq loss detection, heartbeat timeouts | ✅ Done |
 | 5 | Ryu port/flow stats polling | 🔄 Port stats done; flow stats later |
 | 6 | Utilization calculation + SQLite storage | 🔄 Utilization done; SQLite after D1 |
-| 7 | Static thresholds + alerting (cooldown, resolved) | ⬜ |
+| 7 | Static thresholds + alerting (cooldown, resolved) | 🔄 Link utilization + heartbeats done; CPU, loss, latency later |
 | 8 | Correlation rules + optional EWMA dynamic thresholds | ⬜ |
 | 9 | Streamlit dashboard | ⬜ |
 | 10 | Test scenarios: baseline, iperf congestion, CPU stress, node failure, hping3 flood, TCLink loss | ⬜ |
