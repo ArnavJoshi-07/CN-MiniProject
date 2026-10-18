@@ -5,10 +5,10 @@ Hosts send application telemetry over **UDP**; an SDN controller combines it
 with **OpenFlow port statistics** to detect abnormal conditions, raise alerts,
 and install flow rules in response.
 
-> **Status (17 Oct):** working on deliverable D1. The topology, agents,
-> telemetry receiver, link-utilization polling and heartbeat alerts are verified
-> in Mininet; utilization alerts are unit-tested and raise CRITICAL in Mininet
-> (RESOLVED still to confirm); next is the mitigation rule. See [D1 progress](#d1-deliverable) and the work logs
+> **Status (18 Oct):** deliverable D1 is complete. The topology, agents,
+> telemetry receiver, link-utilization polling, heartbeat and utilization alerts,
+> and the correlation + mitigation rule are all verified in Mininet (see the
+> [D1 test cases](#d1-test-cases)). See [D1 progress](#d1-deliverable) and the work logs
 > ([3 Oct](README2.md), [17 Oct](README3.md)).
 
 ---
@@ -28,9 +28,13 @@ and install flow rules in response.
  │    h1-h3  h4-h6  h7-h9  h10-h12                                       │
  │                                                                       │
  │   agent on every host ── UDP telemetry (JSON, every 2 s) ──> monitor  │
- └───────────────┬──────────────────────────────────────────┬────────────┘
-                 │ OpenFlow 1.3 (TCP :6653)                 │ UDP :9999
-                 ▼                                          ▼
+ │                                                                       │
+ │   mitigation, e.g. h1 floods: rules on its edge port s4-eth1 drop     │
+ │   everything from h1 except its telemetry (and ARP for the monitor)   │
+ └─────────┬──────────────▲────────────────────────────────────┬─────────┘
+           │ port stats   │ FlowMods: mitigation rules         │ UDP :9999
+           │ every 2 s    │ (hard_timeout 30 s)                │ telemetry
+           ▼              │     OpenFlow 1.3 over TCP :6653    ▼
         ┌──────────────────────────────────────────────────────────┐
         │ Ryu controller: controller/monitor_app.py                │
         │  • learning-switch forwarding (subclass of               │
@@ -39,7 +43,8 @@ and install flow rules in response.
         │  • port stats every 2 s -> per-port link utilization     │
         │  • heartbeat checker: "unreachable" / "resolved" alerts  │
         │  • utilization alerts: WARNING 70 % / CRITICAL 90 %      │
-        │  • next: correlation, mitigation                         │
+        │  • correlation: host port busy but its agent sent        │
+        │    little -> "unexplained" alert + mitigation rules      │
         └─────────────────────────────┬────────────────────────────┘
                                       │ after D1
                                       ▼
@@ -52,7 +57,7 @@ and install flow rules in response.
 |---|---|---|---|
 | Topology | `topology/` | System Python (sudo) | Mininet 3-tier tree: 7 switches, 12 hosts, monitor node, `TCLink` bandwidths. Writes `logs/topology.json` and starts the agents |
 | Telemetry agent | `agent/` | System Python inside each Mininet host | Sends CPU, memory and byte counters as JSON over UDP every 2 s |
-| Controller | `controller/` | `ryu-env` (Python 3.9) | Forwarding, telemetry receiver, port stats polling and utilization, heartbeat and utilization alerts; later correlation, mitigation |
+| Controller | `controller/` | `ryu-env` (Python 3.9) | Forwarding, telemetry receiver, port stats polling and utilization, heartbeat and utilization alerts, correlation + mitigation flow rules |
 | Dashboard | `dashboard/` | Own uv project (modern Python) | After D1: live view of nodes, link utilization, and alerts |
 | Server | `server/` | — | Unused for now (see [Design decisions](#design-decisions)) |
 
@@ -158,7 +163,7 @@ Optional: dynamic thresholds using EWMA mean + 3σ.
 
 | Condition | Diagnosis |
 |---|---|
-| High ingress rate on a host's switch port + low `app_tx_bytes` rate | Traffic not explained by the application → drop rule on that port, telemetry still allowed (D1 task 7) |
+| High ingress rate on a host's switch port + low `app_tx_bytes` rate | Traffic not explained by the application → drop rule on that port, telemetry still allowed (D1, see below) |
 | High latency + high link utilization | Congestion |
 | High latency/CPU + normal utilization | Host problem |
 | No telemetry, but switch port still active | Agent failure |
@@ -188,6 +193,54 @@ ALERT RESOLVED utilization s1->s3: s1-eth2 tx 0.1% of 10 Mbit/s (0.01 Mbit/s), u
   its severity for 10 s, so a link hovering around 70 % keeps one alert open
   instead of raising and resolving it every 2 s. `unreachable` has no
   cooldown: the first message from the node resolves it.
+
+**Correlation + mitigation** (D1's telemetry-triggered flow-rule change). On
+every port stats reply for a port a host attaches to, the controller compares
+two views of what that host sends:
+
+```
+switch: rx rate of the host's port   = everything the host transmits
+agent:  rate of its app_tx_bytes     = what the application itself sent
+```
+
+When the port receives at least 60 % of the host link and the agent accounts
+for under 10 % of that, the traffic is not explained by the application (e.g.
+an `hping3` flood). The controller raises `ALERT CRITICAL unexplained hN`
+(cooldown 10 s) and installs three rules on the host's edge port, each with
+`hard_timeout=30`:
+
+| Priority | Match (all on the host's in_port) | Action |
+|---|---|---|
+| 200 | UDP to 10.0.0.100:9999 (telemetry) | Output on the port towards the monitor |
+| 200 | ARP for 10.0.0.100 | Output on the port towards the monitor |
+| 100 | anything else | Drop |
+
+- **60 %, not 50 %:** a normal TCP flow to a host behind a 50 Mbit/s link
+  reaches about 48 % of the 100 Mbit/s host link and must not be cut off.
+- **The allow rules output directly** on the port towards the monitor (found by
+  a breadth-first walk over `topology.json`): there is one flow table and the
+  first matching rule ends the lookup, so they can't hand packets on to the
+  learned flows. All three rules outrank simple_switch_13's learned flows
+  (priority 1).
+- **ARP is allowed** because nothing confirms a one-way UDP stream, so Linux
+  re-checks the monitor's MAC every 15–45 s. Dropping that would stop
+  telemetry too.
+- **Renewal and expiry:** the switch counts received packets before the flow
+  table, so the alert stays active while the flood continues, even though it
+  is dropped. The rules are installed again in their last 4 s. Once the
+  traffic stops, the alert resolves after the 10 s cooldown and the switch
+  deletes the rules by itself within 30 s.
+- The drop happens at the switch, so the host's own outgoing queue is still
+  full during a flood and some of its telemetry may be lost.
+
+The controller logs (rates vary per run):
+```
+ALERT CRITICAL unexplained h1: traffic not explained by the application: s4-eth1 rx 95.80 Mbit/s (95.8% of 100 Mbit/s), agent sent 1.1 kbit/s (0.00%)
+MITIGATION h1: installed on s4-eth1 for 30 s: drop everything from h1 except telemetry (udp 10.0.0.100:9999) and arp for 10.0.0.100, sent out s4-eth4
+MITIGATION h1: renewed on s4-eth1 for 30 s, traffic still not explained
+ALERT RESOLVED unexplained h1: s4-eth1 rx ... (alert lasted ... s)
+MITIGATION h1: rules on s4-eth1 expired (hard_timeout 30 s), its traffic is forwarded normally again
+```
 
 ---
 
@@ -278,6 +331,25 @@ h5 python3 agent/agent.py --node-id=h5 --monitor-ip 10.0.0.100 --port 9999 --int
 > `pkill -f agent.py`: Mininet hosts share one process list, so it would stop
 > all 12 agents.
 
+**Flood (correlation + mitigation test):**
+```
+h11 iperf -s &                                       # iperf server on h11
+h2 iperf -c 10.0.0.11 -t 10                          # baseline across the bottleneck: ≈ 9.6 Mbit/s
+h1 hping3 --flood --udp -p 5001 -d 1200 10.0.0.11 &  # h1 floods h11
+                                 # -> ALERT CRITICAL unexplained h1, MITIGATION h1: installed on s4-eth1
+sh ovs-ofctl -O OpenFlow13 dump-flows s4             # 3 rules with hard_timeout=30; the drop rule's n_packets keeps rising
+h2 iperf -c 10.0.0.11 -t 10                          # recovers: h1's flood is dropped at s4
+h1 pkill hping3                  # stop the flood -> ALERT RESOLVED after ~10 s, MITIGATION ... expired within 30 s
+h1 ping -c3 10.0.0.11                                # h1 is forwarded normally again
+h11 kill %iperf
+```
+While the flood runs, h1's seq numbers keep increasing in the controller log
+(its telemetry passes the allow rule). Before the rules land, the flood also
+fills h1's path, so utilization alerts on `s4->s2`, `s2->s1` and `s1->s3` may
+appear; they resolve once the dropped traffic is off those links.
+> Keep `-d 1200`: hping3's default packets are 54 bytes, and it may not send
+> enough of them to reach the 60 % trigger on a 100 Mbit/s link.
+
 **Cleanup** (always after exiting, and after any crash):
 ```bash
 sudo mn -c
@@ -297,9 +369,21 @@ telemetry with port stats; at least one telemetry-triggered flow-rule change.
 | 3 | Ryu app: learning switch + UDP telemetry listener, per-node seq/loss | ✅ Running in Mininet |
 | 4 | Port stats polling + utilization from `topology.json` | ✅ Verified in Mininet (bottleneck at 96.5 % during iperf h1 → h10) |
 | 5 | Heartbeat checker (unreachable / resolved) | ✅ Verified in Mininet (h5 agent killed → CRITICAL, restarted → RESOLVED) |
-| 6 | Static utilization alerts (70 / 90 %, de-dup + cooldown) | 🔄 Unit-tested; in Mininet iperf h1 → h10 raised CRITICAL `s1->s3` (93.9 %), RESOLVED still to confirm |
-| 7 | Correlation + mitigation flow rules | ⬜ |
-| 8 | README: mitigation path in diagram, test-case table | ⬜ |
+| 6 | Static utilization alerts (70 / 90 %, de-dup + cooldown) | ✅ Verified in Mininet (iperf h1 → h10 raised CRITICAL `s1->s3` at 93.9 %, RESOLVED after the 10 s cooldown, no other link alerted) |
+| 7 | Correlation + mitigation flow rules | ✅ Verified in Mininet (hping3 flood from h1 → drop rule on s4-eth1, h2 → h11 recovered, h1 telemetry continued) |
+| 8 | README: mitigation path in diagram, test-case table | ✅ Done |
+
+### D1 test cases
+
+All run in Mininet with the commands in [How to run](#how-to-run).
+
+| # | Test | How | Expected | Result |
+|---|---|---|---|---|
+| 1 | Connectivity | `pingall` | 0 % dropped | ✅ |
+| 2 | All 12 nodes reporting | Start the topology, watch the controller log | `new node h1` … `h12`, seq increasing, 0 % loss | ✅ 12 agents, 312 msgs each, no send errors |
+| 3 | Utilization under congestion | `iperf` h1 → h10 (crosses the s3–s1 bottleneck) | s1 → s3 ≈ 96 %, `CRITICAL utilization s1->s3`, `RESOLVED` ~10 s after iperf ends, no other link alerts | ✅ 96.5 % mid-transfer, CRITICAL raised at 93.9 %, RESOLVED after cooldown, no other alerts |
+| 4 | Agent failure | `h5 kill %python3`, then restart the agent | `CRITICAL unreachable h5` within ~7 s, `RESOLVED` when it is back | ✅ |
+| 5 | Unexplained traffic | `hping3 --flood` from h1 to h11 | `CRITICAL unexplained h1`, 3 rules on s4-eth1, h2 → h11 recovers, h1 telemetry continues, rules expire ≤ 30 s after the flood stops | ✅ |
 
 ## 12-day plan
 
@@ -312,9 +396,9 @@ telemetry with port stats; at least one telemetry-triggered flow-rule change.
 | 5 | Ryu port/flow stats polling | 🔄 Port stats done; flow stats later |
 | 6 | Utilization calculation + SQLite storage | 🔄 Utilization done; SQLite after D1 |
 | 7 | Static thresholds + alerting (cooldown, resolved) | 🔄 Link utilization + heartbeats done; CPU, loss, latency later |
-| 8 | Correlation rules + optional EWMA dynamic thresholds | ⬜ |
+| 8 | Correlation rules + optional EWMA dynamic thresholds | 🔄 "Traffic not explained" rule + mitigation done; other rules and EWMA later |
 | 9 | Streamlit dashboard | ⬜ |
-| 10 | Test scenarios: baseline, iperf congestion, CPU stress, node failure, hping3 flood, TCLink loss | ⬜ |
+| 10 | Test scenarios: baseline, iperf congestion, CPU stress, node failure, hping3 flood, TCLink loss | 🔄 Congestion, agent failure and flood done for D1; the rest later |
 | 11 | Report + README | ⬜ |
 | 12 | Full demo dry run, backup recording | ⬜ |
 
@@ -341,6 +425,9 @@ telemetry with port stats; at least one telemetry-triggered flow-rule change.
 - **No hardcoded maps.** Port numbers, capacities and host locations come from
   `logs/topology.json`, re-read whenever a switch connects (Mininet rewrites it
   on every start, after Ryu is already running).
+- **Mitigation rules expire on their own.** They use `hard_timeout`, and the
+  controller only installs them again while the traffic continues, so a host
+  is never left cut off, even if the controller stops or restarts.
 
 ---
 
@@ -351,7 +438,7 @@ CN-MiniProject/
 ├── agent/
 │   └── agent.py          # UDP telemetry agent (runs in each Mininet host)
 ├── controller/
-│   └── monitor_app.py    # Ryu app: forwarding + telemetry + port stats + alerts
+│   └── monitor_app.py    # Ryu app: forwarding + telemetry + port stats + alerts + mitigation
 ├── topology/
 │   └── topology.py       # Mininet tree, monitor node, topology.json, agents
 ├── dashboard/            # Streamlit app (after D1)

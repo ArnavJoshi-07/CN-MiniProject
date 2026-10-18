@@ -12,6 +12,8 @@ it runs three green threads.
                    "last_seq": 41,       # highest seq seen so far
                    "received": 40,       # messages that arrived
                    "lost": 1,            # seq numbers that never arrived
+                   "app_tx_bps": 1080.0, # agent's own send rate, from
+                                         # app_tx_bytes (None until 2 msgs)
                    "telemetry": {...}}   # latest message, as sent
 
    Loss is counted from gaps in seq: seq 5 arriving right after seq 3 means
@@ -56,6 +58,30 @@ A higher severity is logged at once. A lower one, or RESOLVED, only after the
 link has stayed below the active severity for 10 s (the cooldown), so a link
 hovering around a threshold doesn't log a new line every 2 s.
 
+Correlation + mitigation also runs on every port stats reply, for the ports
+hosts attach to. It compares two views of what a host sends:
+
+    switch: rx rate of the host's port   = everything the host transmits
+    agent:  rate of its app_tx_bytes     = what the application itself sent
+
+When the port carries at least 60 % of the host link and the agent accounts
+for under 10 % of that, the traffic is not explained by the application
+(e.g. an hping3 flood):
+
+    ALERT CRITICAL unexplained h1: traffic not explained by the application: s4-eth1 rx 95.80 Mbit/s (95.8% of 100 Mbit/s), agent sent 1.1 kbit/s (0.00%)
+
+and the controller installs three flow rules for that port on the host's
+switch, each with hard_timeout=30, so the switch deletes them by itself:
+
+    priority 200  udp to 10.0.0.100:9999  -> port towards the monitor
+    priority 200  arp for 10.0.0.100      -> port towards the monitor
+    priority 100  anything else           -> drop
+
+The host's telemetry keeps flowing, everything else it sends is dropped at
+the first switch. All three outrank simple_switch_13's learned flows
+(priority 1). While the traffic keeps arriving the rules are renewed just
+before they expire; once it stops they time out within 30 s.
+
 Run (from the project root, inside ryu-env):
     ryu-manager --ofp-tcp-listen-port 6653 controller/monitor_app.py
 """
@@ -71,11 +97,13 @@ from ryu.controller import ofp_event
 from ryu.controller.handler import MAIN_DISPATCHER, DEAD_DISPATCHER
 from ryu.controller.handler import set_ev_cls
 from ryu.lib import hub
+from ryu.lib.packet import ether_types, in_proto
 
 
 # 0.0.0.0 = every interface of the root namespace, including the monitor
 # link's 10.0.0.100 (topology/topology.py).
-TELEMETRY_ADDR = ("0.0.0.0", 9999)
+TELEMETRY_PORT = 9999
+TELEMETRY_ADDR = ("0.0.0.0", TELEMETRY_PORT)
 MAX_DATAGRAM = 4096        # agent messages are ~200 bytes
 
 # Every agent message has these fields (see agent/agent.py).
@@ -102,11 +130,27 @@ UTIL_THRESHOLDS = (("CRITICAL", 90.0), ("WARNING", 70.0))
 ALERT_LEVELS = {"WARNING": logging.WARNING, "CRITICAL": logging.CRITICAL}
 
 # Alert kind -> cooldown in seconds: how long its problem must stay below the
-# active severity before the alert is lowered or resolved. Utilization is
-# measured every 2 s and is noisy, so without it a link hovering around 70 %
-# would be raised and resolved over and over. Kinds not listed resolve at
-# once: for "unreachable", a message arriving is not noise.
-ALERT_COOLDOWN = {"utilization": 10}
+# active severity before the alert is lowered or resolved. Rates measured
+# every 2 s are noisy, so without it a link hovering around 70 % would be
+# raised and resolved over and over. Kinds not listed resolve at once: for
+# "unreachable", a message arriving is not noise.
+ALERT_COOLDOWN = {"utilization": 10, "unexplained": 10}
+
+# Correlation rule: traffic from a host is "not explained by the application"
+# when its switch port receives at least UNEXPLAINED_MIN_UTIL % of the host
+# link and the agent's own traffic is under UNEXPLAINED_MAX_SHARE % of that.
+# 60, not 50: a TCP flow to a host behind a 50 Mbit/s link reaches ~48 %,
+# and normal (if unreported) traffic like that shouldn't be cut off.
+UNEXPLAINED_MIN_UTIL = 60.0
+UNEXPLAINED_MAX_SHARE = 10.0
+
+# Mitigation flow rules. simple_switch_13's learned flows have priority 1.
+ALLOW_PRIORITY = 200       # telemetry (and ARP) to the monitor still passes
+DROP_PRIORITY = 100        # everything else from the host's port is dropped
+MITIGATION_TIMEOUT = 30    # hard_timeout (s): the switch deletes the rules then
+# While the traffic continues, install the rules again this long before they
+# expire. Checks come every STATS_INTERVAL, so this window always gets one.
+MITIGATION_RENEW = 2 * STATS_INTERVAL
 
 
 def parse_telemetry(data):
@@ -132,7 +176,20 @@ def parse_telemetry(data):
 
 def new_node_state(msg):
     return {"last_seen": time.monotonic(), "last_seq": msg["seq"],
-            "received": 1, "lost": 0, "telemetry": msg}
+            "received": 1, "lost": 0, "app_tx_bps": None, "telemetry": msg}
+
+
+def app_rate(prev, msg):
+    """bit/s the agent sent between two of its messages, or None.
+
+    app_tx_bytes is cumulative and the timestamps are the agent's own, so the
+    rate stays right even when the messages in between were lost.
+    """
+    dt = msg["timestamp"] - prev["timestamp"]
+    d_bytes = msg["app_tx_bytes"] - prev["app_tx_bytes"]
+    if dt <= 0 or d_bytes < 0:
+        return None
+    return d_bytes * 8 / dt
 
 
 def loss_pct(state):
@@ -148,6 +205,28 @@ def util_severity(util):
     return None
 
 
+def ports_towards_monitor(topo):
+    """dpid -> the port through which that switch reaches the monitor.
+
+    Walks out from the monitor's switch: a switch first reached from its
+    neighbour n reaches the monitor through its port to n. The topology is
+    loop-free, so that is the only way there.
+    """
+    switches = topo["switches"]                   # "s1" -> dpid
+    # (dpid, neighbour's dpid) -> port, for every switch-to-switch link
+    links = {(p["dpid"], switches[p["peer"]]): p["port"]
+             for p in topo["ports"] if p["peer"] in switches}
+    monitor = topo["monitor"]
+    towards = {monitor["dpid"]: monitor["port"]}
+    reached = [monitor["dpid"]]
+    for n in reached:          # grows while we loop over it: breadth-first
+        for (dpid, peer), port in links.items():
+            if peer == n and dpid not in towards:
+                towards[dpid] = port
+                reached.append(dpid)
+    return towards
+
+
 class MonitorApp(SimpleSwitch13):
     """simple_switch_13 forwarding + telemetry tracking + port utilization."""
 
@@ -160,11 +239,17 @@ class MonitorApp(SimpleSwitch13):
         self.capacity = {}       # (dpid, port) -> link capacity in bit/s
         self.port_peer = {}      # (dpid, port) -> node at the other end
         self.switch_names = {}   # dpid -> "s1"
-        self.host_port = {}      # "h1" -> (dpid, port) it attaches to (task 7)
+        self.host_port = {}      # "h1" -> (dpid, port) it attaches to
+        self.monitor_ip = None   # "10.0.0.100"
+        self.monitor_port = {}   # dpid -> port towards the monitor
 
         self.datapaths = {}      # dpid -> Datapath, switches connected now
         self.port_stats = {}     # (dpid, port) -> state dict (see docstring)
         self.unknown_ports = set()   # ports with no capacity, already warned
+
+        # "h1" -> {"dpid": 4, "port": 1, "expires": monotonic time} for every
+        # host whose mitigation rules should be on its switch now.
+        self.mitigations = {}
 
         # (kind, subject) -> {"severity": "CRITICAL", "since": monotonic time,
         #                     "seen": {"WARNING": t, "CRITICAL": t}}
@@ -221,6 +306,7 @@ class MonitorApp(SimpleSwitch13):
             state["received"] += 1
             state["last_seq"] = seq
             state["last_seen"] = time.monotonic()
+            state["app_tx_bps"] = app_rate(state["telemetry"], msg)
             state["telemetry"] = msg
         elif msg["timestamp"] > state["telemetry"]["timestamp"]:
             # Lower seq but a newer reading: the agent restarted (e.g. Mininet
@@ -347,15 +433,18 @@ class MonitorApp(SimpleSwitch13):
                             for name, dpid in topo["switches"].items()}
             host_port = {h: (a["dpid"], a["port"])
                          for h, a in topo["hosts"].items()}
+            monitor_ip = topo["monitor"]["ip"]
+            monitor_port = ports_towards_monitor(topo)
         except (OSError, ValueError, KeyError, TypeError) as e:
             self.logger.error("topology: cannot read %s (%s). Utilization "
-                              "is unavailable until it can be read.",
-                              TOPOLOGY_JSON, e)
+                              "and mitigation are unavailable until it can "
+                              "be read.", TOPOLOGY_JSON, e)
             return
 
         self.topology_mtime = mtime
         self.capacity, self.port_peer = capacity, port_peer
         self.switch_names, self.host_port = switch_names, host_port
+        self.monitor_ip, self.monitor_port = monitor_ip, monitor_port
         self.unknown_ports.clear()
         self.logger.info("topology: loaded %d switches, %d hosts, %d ports "
                          "from %s", len(switch_names), len(host_port),
@@ -387,6 +476,11 @@ class MonitorApp(SimpleSwitch13):
             # and count from 0 again.
             for key in [k for k in self.port_stats if k[0] == dp.id]:
                 del self.port_stats[key]
+            # And its mitigations: a restarted switch has lost the rules, and
+            # if it still has them, installing them again just replaces them.
+            for host in [h for h, m in self.mitigations.items()
+                         if m["dpid"] == dp.id]:
+                del self.mitigations[host]
             self.logger.info("switch: %s disconnected (dpid %d)",
                              self.switch_names.get(dp.id, "?"), dp.id)
 
@@ -453,6 +547,9 @@ class MonitorApp(SimpleSwitch13):
                              cur["rx_util"], cur["rx_bps"] / 1e6,
                              cur["tx_util"], cur["tx_bps"] / 1e6)
         self._check_util(key, cur, capacity)
+        peer = self.port_peer.get(key)
+        if peer in self.host_port:
+            self._check_unexplained(peer, key, cur, capacity)
 
     def _check_util(self, key, cur, capacity):
         """Raise or resolve the utilization alerts of the link at this port.
@@ -484,3 +581,110 @@ class MonitorApp(SimpleSwitch13):
                     "utilization", link, "%s, under %.0f%% for %d s" % (
                         text, UTIL_THRESHOLDS[-1][1],
                         ALERT_COOLDOWN["utilization"]))
+
+    # --- Correlation + mitigation ------------------------------------------
+
+    def _check_unexplained(self, host, key, cur, capacity):
+        """Correlate the host's port stats with its telemetry.
+
+        cur["rx_bps"] is everything the switch received from the host;
+        app_tx_bps is what the host's agent says it sent itself. A busy port
+        that the agent can't account for raises the "unexplained" alert and
+        gets the mitigation rules. The switch keeps counting the host's
+        packets even when a rule drops them, so the alert stays up as long
+        as the traffic keeps coming, mitigated or not.
+        """
+        node = self.nodes.get(host)
+        if node is None or node["app_tx_bps"] is None:
+            return          # no rate from the agent yet: nothing to compare
+        app_bps, rx_bps = node["app_tx_bps"], cur["rx_bps"]
+        # % of the traffic from the host that its agent explains. An idle
+        # port has nothing to explain.
+        share = min(100.0, app_bps / rx_bps * 100) if rx_bps else 100.0
+        text = ("%s rx %.2f Mbit/s (%.1f%% of %.0f Mbit/s), agent sent "
+                "%.1f kbit/s (%.2f%%)" % (
+                    self._port_name(*key), rx_bps / 1e6, cur["rx_util"],
+                    capacity / 1e6, app_bps / 1e3, share))
+
+        if (cur["rx_util"] >= UNEXPLAINED_MIN_UTIL
+                and share < UNEXPLAINED_MAX_SHARE):
+            self._raise_alert("unexplained", host, "CRITICAL",
+                              "traffic not explained by the application: "
+                              + text)
+            self._mitigate(host, key)
+            return
+
+        self._resolve_alert("unexplained", host, text)
+        active = self.mitigations.get(host)
+        if active and time.monotonic() >= active["expires"]:
+            # Nothing to send: the switch has already deleted the rules.
+            del self.mitigations[host]
+            self.logger.warning("MITIGATION %s: rules on %s expired "
+                                "(hard_timeout %d s), its traffic is "
+                                "forwarded normally again", host,
+                                self._port_name(*key), MITIGATION_TIMEOUT)
+
+    def _mitigate(self, host, key):
+        """Put the mitigation rules on the host's port, or renew them."""
+        now = time.monotonic()
+        active = self.mitigations.get(host)
+        if active and now < active["expires"] - MITIGATION_RENEW:
+            return                  # in place, and not about to expire
+
+        dpid, port_no = key
+        dp = self.datapaths.get(dpid)
+        out_port = self.monitor_port.get(dpid)
+        if dp is None or out_port is None:
+            self.logger.error("MITIGATION %s: cannot install on %s (switch "
+                              "not connected or no path to the monitor)",
+                              host, self._port_name(*key))
+            return
+        self._install_mitigation(dp, port_no, out_port)
+        self.mitigations[host] = {"dpid": dpid, "port": port_no,
+                                  "expires": now + MITIGATION_TIMEOUT}
+
+        if active:
+            self.logger.warning("MITIGATION %s: renewed on %s for %d s, "
+                                "traffic still not explained", host,
+                                self._port_name(*key), MITIGATION_TIMEOUT)
+        else:
+            self.logger.warning(
+                "MITIGATION %s: installed on %s for %d s: drop everything "
+                "from %s except telemetry (udp %s:%d) and arp for %s, sent "
+                "out %s", host, self._port_name(*key), MITIGATION_TIMEOUT,
+                host, self.monitor_ip, TELEMETRY_PORT, self.monitor_ip,
+                self._port_name(dpid, out_port))
+
+    def _install_mitigation(self, dp, in_port, out_port):
+        """Send the three flow rules for in_port, each with hard_timeout.
+
+        Installing a rule whose match and priority are already in the table
+        replaces it (OpenFlow 1.3), with a fresh timeout: that is how
+        renewing works.
+        """
+        ofp, parser = dp.ofproto, dp.ofproto_parser
+        # The allow rules send packets straight out of the port towards the
+        # monitor: there is one flow table, and the first matching rule ends
+        # the lookup, so they can't hand packets on to the learned flows.
+        to_monitor = [parser.OFPInstructionActions(
+            ofp.OFPIT_APPLY_ACTIONS, [parser.OFPActionOutput(out_port)])]
+        rules = [
+            # Telemetry. OpenFlow only accepts a field if the layer below is
+            # matched too: udp_dst needs ip_proto=UDP, which needs IPv4.
+            (ALLOW_PRIORITY, parser.OFPMatch(
+                in_port=in_port, eth_type=ether_types.ETH_TYPE_IP,
+                ip_proto=in_proto.IPPROTO_UDP, ipv4_dst=self.monitor_ip,
+                udp_dst=TELEMETRY_PORT), to_monitor),
+            # ARP for the monitor. Nothing confirms a one-way UDP stream,
+            # so Linux re-checks the monitor's MAC with an ARP request every
+            # 15-45 s; if that were dropped, telemetry would stop too.
+            (ALLOW_PRIORITY, parser.OFPMatch(
+                in_port=in_port, eth_type=ether_types.ETH_TYPE_ARP,
+                arp_tpa=self.monitor_ip), to_monitor),
+            # Everything else from the port. No instructions = drop.
+            (DROP_PRIORITY, parser.OFPMatch(in_port=in_port), []),
+        ]
+        for priority, match, inst in rules:
+            dp.send_msg(parser.OFPFlowMod(
+                datapath=dp, priority=priority, match=match,
+                instructions=inst, hard_timeout=MITIGATION_TIMEOUT))
