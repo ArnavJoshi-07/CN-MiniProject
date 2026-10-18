@@ -9,7 +9,7 @@ and install flow rules in response.
 > telemetry receiver, link-utilization polling, heartbeat and utilization alerts,
 > and the correlation + mitigation rule are all verified in Mininet (see the
 > [D1 test cases](#d1-test-cases)). See [D1 progress](#d1-deliverable) and the work logs
-> ([3 Oct](README2.md), [17 Oct](README3.md)).
+> ([3 Oct](README2.md), [17 Oct](README3.md), [18 Oct](README4.md)).
 
 ---
 
@@ -447,5 +447,6 @@ CN-MiniProject/
 ├── ryu-env/              # gitignored
 ├── README.md             # this file
 ├── README2.md            # work log, 3 Oct
-└── README3.md            # work log, 17 Oct
+├── README3.md            # work log, 17 Oct
+└── README4.md            # work log, 18 Oct
 ```
