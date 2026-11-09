@@ -1,0 +1,69 @@
+23:49:01 waiting 5 s for switches, then pingall
+23:49:07 pingall: 0.0% dropped
+23:49:07 waiting 20 s so every agent has sent several messages
+23:49:27 === Diagnostic: h1 flood rate per destination (5 s each) ===
+23:49:27 h1> hping3 --flood --udp -p 5001 -d 1200 10.0.0.11 >/dev/null 2>&1 &
+23:49:27     [2] 373098
+23:49:32     h1 -> h11 (10 Mbit s1-s3 on path): h1-eth0 tx 10.0 Mbit/s
+23:49:32 h1> pkill hping3
+23:49:32     waiting 15 s for alerts to resolve
+23:49:47 h1> hping3 --flood --udp -p 5001 -d 1200 10.0.0.4 >/dev/null 2>&1 &
+23:49:47     [3] 373664
+23:49:52     h1 -> h4 (50 Mbit s4-s2 on path): h1-eth0 tx 50.0 Mbit/s
+23:49:52 h1> pkill hping3
+23:49:52     waiting 15 s for alerts to resolve
+23:50:07 === T5 flood: h1 -> h3 (same edge switch s4) ===
+23:50:07 h3> iperf -s -u >/dev/null 2>&1 &
+23:50:07     [2] 374275
+23:50:07 h2> iperf -u -c 10.0.0.3 -b 30M -l 1200 -t 10
+23:50:17     ------------------------------------------------------------
+23:50:17     Client connecting to 10.0.0.3, UDP port 5001
+23:50:17     Sending 1200 byte datagrams, IPG target: 0.00 us (kalman adjust)
+23:50:17     UDP buffer size:  208 KByte (default)
+23:50:17     ------------------------------------------------------------
+23:50:17     [  1] local 10.0.0.2 port 53092 connected with 10.0.0.3 port 5001
+23:50:17     [ ID] Interval       Transfer     Bandwidth
+23:50:17     [  1] 0.0000-10.0004 sec  37.5 MBytes  31.5 Mbits/sec
+23:50:17     [  1] Sent 32771 datagrams
+23:50:17     [  1] Server Report:
+23:50:17     [ ID] Interval       Transfer     Bandwidth        Jitter   Lost/Total Datagrams
+23:50:17     [  1] 0.0000-10.0003 sec  37.5 MBytes  31.5 Mbits/sec   0.000 ms 0/32770 (0%)
+23:50:17 h1> hping3 --flood --udp -p 5001 -d 1200 10.0.0.3 >/dev/null 2>&1 &
+23:50:17     [4] 374630
+23:50:20     h1 -> h3: h1-eth0 tx 100.2 Mbit/s (trigger is 60 Mbit/s)
+23:50:22 sh> ovs-ofctl -O OpenFlow13 dump-flows s4 | grep priority=(100|200)
+23:50:22     cookie=0x0, duration=3.652s, table=0, n_packets=2, n_bytes=397, hard_timeout=30, priority=200,udp,in_port=1,nw_dst=10.0.0.100,tp_dst=9999 actions=output:4
+23:50:22     cookie=0x0, duration=3.652s, table=0, n_packets=0, n_bytes=0, hard_timeout=30, priority=200,arp,in_port=1,arp_tpa=10.0.0.100 actions=output:4
+23:50:22     cookie=0x0, duration=3.652s, table=0, n_packets=39028, n_bytes=48472776, hard_timeout=30, priority=100,in_port=1 actions=drop
+23:50:22 h2> iperf -u -c 10.0.0.3 -b 30M -l 1200 -t 10
+23:50:32     ------------------------------------------------------------
+23:50:32     Client connecting to 10.0.0.3, UDP port 5001
+23:50:32     Sending 1200 byte datagrams, IPG target: 0.00 us (kalman adjust)
+23:50:32     UDP buffer size:  208 KByte (default)
+23:50:32     ------------------------------------------------------------
+23:50:32     [  1] local 10.0.0.2 port 42601 connected with 10.0.0.3 port 5001
+23:50:32     [ ID] Interval       Transfer     Bandwidth
+23:50:32     [  1] 0.0000-10.0004 sec  37.5 MBytes  31.5 Mbits/sec
+23:50:32     [  1] Sent 32771 datagrams
+23:50:32     [  1] Server Report:
+23:50:32     [ ID] Interval       Transfer     Bandwidth        Jitter   Lost/Total Datagrams
+23:50:32     [  1] 0.0000-10.0004 sec  37.5 MBytes  31.5 Mbits/sec   0.000 ms 0/32770 (0%)
+23:50:32 sh> ovs-ofctl -O OpenFlow13 dump-flows s4 | grep priority=(100|200)
+23:50:32     cookie=0x0, duration=13.670s, table=0, n_packets=7, n_bytes=1395, hard_timeout=30, priority=200,udp,in_port=1,nw_dst=10.0.0.100,tp_dst=9999 actions=output:4
+23:50:32     cookie=0x0, duration=13.670s, table=0, n_packets=1, n_bytes=42, hard_timeout=30, priority=200,arp,in_port=1,arp_tpa=10.0.0.100 actions=output:4
+23:50:32     cookie=0x0, duration=13.670s, table=0, n_packets=74507, n_bytes=92522094, hard_timeout=30, priority=100,in_port=1 actions=drop
+23:50:32 h1> pkill hping3
+23:50:32     waiting 45 s for RESOLVED + rule expiry (hard_timeout 30)
+23:51:17 sh> ovs-ofctl -O OpenFlow13 dump-flows s4 | grep priority=(100|200)
+23:51:17     (no mitigation rules)
+23:51:17 h1> ping -c3 10.0.0.3
+23:51:19     PING 10.0.0.3 (10.0.0.3) 56(84) bytes of data.
+23:51:19     64 bytes from 10.0.0.3: icmp_seq=1 ttl=64 time=1.68 ms
+23:51:19     64 bytes from 10.0.0.3: icmp_seq=2 ttl=64 time=0.072 ms
+23:51:19     64 bytes from 10.0.0.3: icmp_seq=3 ttl=64 time=0.173 ms
+23:51:19     
+23:51:19     --- 10.0.0.3 ping statistics ---
+23:51:19     3 packets transmitted, 3 received, 0% packet loss, time 2013ms
+23:51:19     rtt min/avg/max/mdev = 0.072/0.642/1.683/0.736 ms
+23:51:19 h3> kill %iperf
+23:51:19 RESULT: PASS {'baseline_loss_pct': 0.0, 'h1_rate': 100.2, 'rules': 3, 'during_mitigation_loss_pct': 0.0, 'rules_after': 0, 'ping_ok': True}
