@@ -3,3 +3,4 @@ ryu-env/
 CLAUDE.md
 __pycache__/
 .vscode/
+results/
