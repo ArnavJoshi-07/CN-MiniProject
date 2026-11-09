@@ -1,0 +1,975 @@
+20:42:11 loading app controller/monitor_app.py
+20:42:11 loading app ryu.controller.ofp_handler
+20:42:11 instantiating app controller/monitor_app.py of MonitorApp
+20:42:11 instantiating app ryu.controller.ofp_handler of OFPHandler
+20:42:11 telemetry: listening on udp 0.0.0.0:9999
+21:54:17 telemetry: skipped malformed packet from 192.168.0.4:50038: 'utf-8' codec can't decode byte 0xd0 in position 0: invalid continuation byte
+21:54:17 telemetry: skipped malformed packet from 192.168.0.4:50038: 'utf-8' codec can't decode byte 0xd0 in position 0: invalid continuation byte
+21:54:17 telemetry: skipped malformed packet from 192.168.0.4:50038: 'utf-8' codec can't decode byte 0xd0 in position 0: invalid continuation byte
+22:15:53 telemetry: skipped malformed packet from 192.168.0.5:50020: 'utf-8' codec can't decode byte 0xd0 in position 0: invalid continuation byte
+22:15:53 telemetry: skipped malformed packet from 192.168.0.5:50020: 'utf-8' codec can't decode byte 0xd0 in position 0: invalid continuation byte
+22:15:53 telemetry: skipped malformed packet from 192.168.0.5:50020: 'utf-8' codec can't decode byte 0xd0 in position 0: invalid continuation byte
+23:49:01 topology: loaded 7 switches, 12 hosts, 25 ports from /home/arnav-joshi/projects/CN-MiniProject/logs/topology.json
+23:49:01 switch: s7 connected (dpid 7)
+23:49:01 switch: s5 connected (dpid 5)
+23:49:01 switch: s4 connected (dpid 4)
+23:49:01 switch: s1 connected (dpid 1)
+23:49:01 switch: s3 connected (dpid 3)
+23:49:01 switch: s6 connected (dpid 6)
+23:49:01 switch: s2 connected (dpid 2)
+23:49:01 telemetry: new node h8
+23:49:01 telemetry: h8   seq=1     received=1     lost=0   loss=0.0%
+23:49:01 telemetry: new node h7
+23:49:01 telemetry: h7   seq=1     received=1     lost=0   loss=0.0%
+23:49:01 telemetry: new node h2
+23:49:01 telemetry: h2   seq=1     received=1     lost=0   loss=0.0%
+23:49:01 telemetry: new node h5
+23:49:01 telemetry: h5   seq=1     received=1     lost=0   loss=0.0%
+23:49:01 telemetry: new node h4
+23:49:01 telemetry: h4   seq=1     received=1     lost=0   loss=0.0%
+23:49:01 telemetry: new node h12
+23:49:01 telemetry: h12  seq=1     received=1     lost=0   loss=0.0%
+23:49:01 telemetry: new node h3
+23:49:01 telemetry: h3   seq=1     received=1     lost=0   loss=0.0%
+23:49:01 telemetry: new node h1
+23:49:01 telemetry: h1   seq=1     received=1     lost=0   loss=0.0%
+23:49:01 telemetry: new node h10
+23:49:01 telemetry: h10  seq=1     received=1     lost=0   loss=0.0%
+23:49:01 telemetry: new node h9
+23:49:01 telemetry: h9   seq=1     received=1     lost=0   loss=0.0%
+23:49:01 telemetry: new node h6
+23:49:01 telemetry: h6   seq=1     received=1     lost=0   loss=0.0%
+23:49:01 telemetry: new node h11
+23:49:01 telemetry: h11  seq=1     received=1     lost=0   loss=0.0%
+23:49:03 telemetry: h8   seq=2     received=2     lost=0   loss=0.0%
+23:49:03 telemetry: h7   seq=2     received=2     lost=0   loss=0.0%
+23:49:03 telemetry: h2   seq=2     received=2     lost=0   loss=0.0%
+23:49:03 telemetry: h5   seq=2     received=2     lost=0   loss=0.0%
+23:49:03 telemetry: h4   seq=2     received=2     lost=0   loss=0.0%
+23:49:03 telemetry: h12  seq=2     received=2     lost=0   loss=0.0%
+23:49:03 telemetry: h3   seq=2     received=2     lost=0   loss=0.0%
+23:49:03 telemetry: h1   seq=2     received=2     lost=0   loss=0.0%
+23:49:03 telemetry: h10  seq=2     received=2     lost=0   loss=0.0%
+23:49:03 telemetry: h9   seq=2     received=2     lost=0   loss=0.0%
+23:49:03 telemetry: h6   seq=2     received=2     lost=0   loss=0.0%
+23:49:03 telemetry: h11  seq=2     received=2     lost=0   loss=0.0%
+23:49:05 telemetry: h8   seq=3     received=3     lost=0   loss=0.0%
+23:49:05 telemetry: h7   seq=3     received=3     lost=0   loss=0.0%
+23:49:05 telemetry: h2   seq=3     received=3     lost=0   loss=0.0%
+23:49:05 telemetry: h4   seq=3     received=3     lost=0   loss=0.0%
+23:49:05 telemetry: h5   seq=3     received=3     lost=0   loss=0.0%
+23:49:05 telemetry: h3   seq=3     received=3     lost=0   loss=0.0%
+23:49:05 telemetry: h12  seq=3     received=3     lost=0   loss=0.0%
+23:49:05 telemetry: h1   seq=3     received=3     lost=0   loss=0.0%
+23:49:05 telemetry: h10  seq=3     received=3     lost=0   loss=0.0%
+23:49:05 telemetry: h9   seq=3     received=3     lost=0   loss=0.0%
+23:49:05 telemetry: h6   seq=3     received=3     lost=0   loss=0.0%
+23:49:05 telemetry: h11  seq=3     received=3     lost=0   loss=0.0%
+23:49:07 telemetry: h8   seq=4     received=4     lost=0   loss=0.0%
+23:49:07 telemetry: h7   seq=4     received=4     lost=0   loss=0.0%
+23:49:07 telemetry: h2   seq=4     received=4     lost=0   loss=0.0%
+23:49:07 telemetry: h4   seq=4     received=4     lost=0   loss=0.0%
+23:49:07 telemetry: h5   seq=4     received=4     lost=0   loss=0.0%
+23:49:07 telemetry: h12  seq=4     received=4     lost=0   loss=0.0%
+23:49:07 telemetry: h3   seq=4     received=4     lost=0   loss=0.0%
+23:49:07 telemetry: h1   seq=4     received=4     lost=0   loss=0.0%
+23:49:07 telemetry: h10  seq=4     received=4     lost=0   loss=0.0%
+23:49:07 telemetry: h9   seq=4     received=4     lost=0   loss=0.0%
+23:49:07 telemetry: h6   seq=4     received=4     lost=0   loss=0.0%
+23:49:07 telemetry: h11  seq=4     received=4     lost=0   loss=0.0%
+23:49:09 telemetry: h8   seq=5     received=5     lost=0   loss=0.0%
+23:49:09 telemetry: h7   seq=5     received=5     lost=0   loss=0.0%
+23:49:09 telemetry: h2   seq=5     received=5     lost=0   loss=0.0%
+23:49:09 telemetry: h5   seq=5     received=5     lost=0   loss=0.0%
+23:49:09 telemetry: h4   seq=5     received=5     lost=0   loss=0.0%
+23:49:09 telemetry: h12  seq=5     received=5     lost=0   loss=0.0%
+23:49:09 telemetry: h3   seq=5     received=5     lost=0   loss=0.0%
+23:49:09 telemetry: h1   seq=5     received=5     lost=0   loss=0.0%
+23:49:09 telemetry: h10  seq=5     received=5     lost=0   loss=0.0%
+23:49:09 telemetry: h9   seq=5     received=5     lost=0   loss=0.0%
+23:49:09 telemetry: h6   seq=5     received=5     lost=0   loss=0.0%
+23:49:09 telemetry: h11  seq=5     received=5     lost=0   loss=0.0%
+23:49:11 telemetry: h7   seq=6     received=6     lost=0   loss=0.0%
+23:49:11 telemetry: h8   seq=6     received=6     lost=0   loss=0.0%
+23:49:11 telemetry: h2   seq=6     received=6     lost=0   loss=0.0%
+23:49:11 telemetry: h5   seq=6     received=6     lost=0   loss=0.0%
+23:49:11 telemetry: h4   seq=6     received=6     lost=0   loss=0.0%
+23:49:11 telemetry: h3   seq=6     received=6     lost=0   loss=0.0%
+23:49:11 telemetry: h12  seq=6     received=6     lost=0   loss=0.0%
+23:49:11 telemetry: h1   seq=6     received=6     lost=0   loss=0.0%
+23:49:11 telemetry: h10  seq=6     received=6     lost=0   loss=0.0%
+23:49:11 telemetry: h9   seq=6     received=6     lost=0   loss=0.0%
+23:49:11 telemetry: h6   seq=6     received=6     lost=0   loss=0.0%
+23:49:11 telemetry: h11  seq=6     received=6     lost=0   loss=0.0%
+23:49:13 telemetry: h8   seq=7     received=7     lost=0   loss=0.0%
+23:49:13 telemetry: h7   seq=7     received=7     lost=0   loss=0.0%
+23:49:13 telemetry: h2   seq=7     received=7     lost=0   loss=0.0%
+23:49:13 telemetry: h5   seq=7     received=7     lost=0   loss=0.0%
+23:49:13 telemetry: h4   seq=7     received=7     lost=0   loss=0.0%
+23:49:13 telemetry: h12  seq=7     received=7     lost=0   loss=0.0%
+23:49:13 telemetry: h3   seq=7     received=7     lost=0   loss=0.0%
+23:49:13 telemetry: h1   seq=7     received=7     lost=0   loss=0.0%
+23:49:13 telemetry: h10  seq=7     received=7     lost=0   loss=0.0%
+23:49:13 telemetry: h9   seq=7     received=7     lost=0   loss=0.0%
+23:49:13 telemetry: h6   seq=7     received=7     lost=0   loss=0.0%
+23:49:13 telemetry: h11  seq=7     received=7     lost=0   loss=0.0%
+23:49:15 telemetry: h8   seq=8     received=8     lost=0   loss=0.0%
+23:49:15 telemetry: h7   seq=8     received=8     lost=0   loss=0.0%
+23:49:15 telemetry: h2   seq=8     received=8     lost=0   loss=0.0%
+23:49:15 telemetry: h5   seq=8     received=8     lost=0   loss=0.0%
+23:49:15 telemetry: h4   seq=8     received=8     lost=0   loss=0.0%
+23:49:15 telemetry: h12  seq=8     received=8     lost=0   loss=0.0%
+23:49:15 telemetry: h3   seq=8     received=8     lost=0   loss=0.0%
+23:49:15 telemetry: h1   seq=8     received=8     lost=0   loss=0.0%
+23:49:15 telemetry: h10  seq=8     received=8     lost=0   loss=0.0%
+23:49:15 telemetry: h9   seq=8     received=8     lost=0   loss=0.0%
+23:49:15 telemetry: h6   seq=8     received=8     lost=0   loss=0.0%
+23:49:15 telemetry: h11  seq=8     received=8     lost=0   loss=0.0%
+23:49:17 telemetry: h8   seq=9     received=9     lost=0   loss=0.0%
+23:49:17 telemetry: h7   seq=9     received=9     lost=0   loss=0.0%
+23:49:17 telemetry: h2   seq=9     received=9     lost=0   loss=0.0%
+23:49:17 telemetry: h5   seq=9     received=9     lost=0   loss=0.0%
+23:49:17 telemetry: h4   seq=9     received=9     lost=0   loss=0.0%
+23:49:17 telemetry: h3   seq=9     received=9     lost=0   loss=0.0%
+23:49:17 telemetry: h12  seq=9     received=9     lost=0   loss=0.0%
+23:49:17 telemetry: h1   seq=9     received=9     lost=0   loss=0.0%
+23:49:17 telemetry: h10  seq=9     received=9     lost=0   loss=0.0%
+23:49:17 telemetry: h9   seq=9     received=9     lost=0   loss=0.0%
+23:49:17 telemetry: h6   seq=9     received=9     lost=0   loss=0.0%
+23:49:17 telemetry: h11  seq=9     received=9     lost=0   loss=0.0%
+23:49:19 telemetry: h8   seq=10    received=10    lost=0   loss=0.0%
+23:49:19 telemetry: h7   seq=10    received=10    lost=0   loss=0.0%
+23:49:19 telemetry: h2   seq=10    received=10    lost=0   loss=0.0%
+23:49:19 telemetry: h5   seq=10    received=10    lost=0   loss=0.0%
+23:49:19 telemetry: h4   seq=10    received=10    lost=0   loss=0.0%
+23:49:19 telemetry: h3   seq=10    received=10    lost=0   loss=0.0%
+23:49:19 telemetry: h12  seq=10    received=10    lost=0   loss=0.0%
+23:49:19 telemetry: h1   seq=10    received=10    lost=0   loss=0.0%
+23:49:19 telemetry: h10  seq=10    received=10    lost=0   loss=0.0%
+23:49:19 telemetry: h9   seq=10    received=10    lost=0   loss=0.0%
+23:49:19 telemetry: h6   seq=10    received=10    lost=0   loss=0.0%
+23:49:19 telemetry: h11  seq=10    received=10    lost=0   loss=0.0%
+23:49:21 telemetry: h8   seq=11    received=11    lost=0   loss=0.0%
+23:49:21 telemetry: h7   seq=11    received=11    lost=0   loss=0.0%
+23:49:21 telemetry: h2   seq=11    received=11    lost=0   loss=0.0%
+23:49:21 telemetry: h5   seq=11    received=11    lost=0   loss=0.0%
+23:49:21 telemetry: h4   seq=11    received=11    lost=0   loss=0.0%
+23:49:21 telemetry: h3   seq=11    received=11    lost=0   loss=0.0%
+23:49:21 telemetry: h12  seq=11    received=11    lost=0   loss=0.0%
+23:49:21 telemetry: h1   seq=11    received=11    lost=0   loss=0.0%
+23:49:21 telemetry: h10  seq=11    received=11    lost=0   loss=0.0%
+23:49:21 telemetry: h9   seq=11    received=11    lost=0   loss=0.0%
+23:49:21 telemetry: h6   seq=11    received=11    lost=0   loss=0.0%
+23:49:21 telemetry: h11  seq=11    received=11    lost=0   loss=0.0%
+23:49:23 telemetry: h8   seq=12    received=12    lost=0   loss=0.0%
+23:49:23 telemetry: h7   seq=12    received=12    lost=0   loss=0.0%
+23:49:23 telemetry: h2   seq=12    received=12    lost=0   loss=0.0%
+23:49:23 telemetry: h5   seq=12    received=12    lost=0   loss=0.0%
+23:49:23 telemetry: h4   seq=12    received=12    lost=0   loss=0.0%
+23:49:23 telemetry: h3   seq=12    received=12    lost=0   loss=0.0%
+23:49:23 telemetry: h12  seq=12    received=12    lost=0   loss=0.0%
+23:49:23 telemetry: h1   seq=12    received=12    lost=0   loss=0.0%
+23:49:23 telemetry: h10  seq=12    received=12    lost=0   loss=0.0%
+23:49:23 telemetry: h9   seq=12    received=12    lost=0   loss=0.0%
+23:49:23 telemetry: h6   seq=12    received=12    lost=0   loss=0.0%
+23:49:23 telemetry: h11  seq=12    received=12    lost=0   loss=0.0%
+23:49:25 telemetry: h8   seq=13    received=13    lost=0   loss=0.0%
+23:49:25 telemetry: h7   seq=13    received=13    lost=0   loss=0.0%
+23:49:25 telemetry: h2   seq=13    received=13    lost=0   loss=0.0%
+23:49:25 telemetry: h4   seq=13    received=13    lost=0   loss=0.0%
+23:49:25 telemetry: h5   seq=13    received=13    lost=0   loss=0.0%
+23:49:25 telemetry: h12  seq=13    received=13    lost=0   loss=0.0%
+23:49:25 telemetry: h3   seq=13    received=13    lost=0   loss=0.0%
+23:49:25 telemetry: h1   seq=13    received=13    lost=0   loss=0.0%
+23:49:25 telemetry: h10  seq=13    received=13    lost=0   loss=0.0%
+23:49:25 telemetry: h9   seq=13    received=13    lost=0   loss=0.0%
+23:49:25 telemetry: h6   seq=13    received=13    lost=0   loss=0.0%
+23:49:25 telemetry: h11  seq=13    received=13    lost=0   loss=0.0%
+23:49:27 telemetry: h8   seq=14    received=14    lost=0   loss=0.0%
+23:49:27 telemetry: h7   seq=14    received=14    lost=0   loss=0.0%
+23:49:27 telemetry: h5   seq=14    received=14    lost=0   loss=0.0%
+23:49:27 telemetry: h4   seq=14    received=14    lost=0   loss=0.0%
+23:49:27 telemetry: h12  seq=14    received=14    lost=0   loss=0.0%
+23:49:27 telemetry: h2   seq=14    received=14    lost=0   loss=0.0%
+23:49:27 telemetry: h3   seq=14    received=14    lost=0   loss=0.0%
+23:49:27 telemetry: h1   seq=14    received=14    lost=0   loss=0.0%
+23:49:27 telemetry: h10  seq=14    received=14    lost=0   loss=0.0%
+23:49:27 telemetry: h9   seq=14    received=14    lost=0   loss=0.0%
+23:49:27 telemetry: h6   seq=14    received=14    lost=0   loss=0.0%
+23:49:27 telemetry: h11  seq=14    received=14    lost=0   loss=0.0%
+23:49:28 util: s7-eth4  -> s3       50 Mbit/s link | rx  14.0%   6.99 Mbit/s | tx   0.0%   0.02 Mbit/s
+23:49:28 util: s7-eth2  -> h11     100 Mbit/s link | rx   0.0%   0.02 Mbit/s | tx   7.0%   6.99 Mbit/s
+23:49:28 util: s4-eth4  -> s2       50 Mbit/s link | rx   0.0%   0.02 Mbit/s | tx  14.5%   7.24 Mbit/s
+23:49:28 util: s4-eth1  -> h1      100 Mbit/s link | rx   7.2%   7.24 Mbit/s | tx   0.0%   0.02 Mbit/s
+23:49:28 util: s3-eth2  -> s7       50 Mbit/s link | rx   0.0%   0.02 Mbit/s | tx  14.0%   7.00 Mbit/s
+23:49:28 util: s3-eth3  -> s1       10 Mbit/s link | rx  70.0%   7.00 Mbit/s | tx   0.2%   0.02 Mbit/s
+23:49:28 util: s1-eth1  -> s2       50 Mbit/s link | rx  14.5%   7.25 Mbit/s | tx   0.0%   0.02 Mbit/s
+23:49:28 util: s1-eth2  -> s3       10 Mbit/s link | rx   0.2%   0.02 Mbit/s | tx  69.9%   6.99 Mbit/s
+23:49:28 util: s2-eth1  -> s4       50 Mbit/s link | rx  14.5%   7.25 Mbit/s | tx   0.0%   0.02 Mbit/s
+23:49:28 util: s2-eth3  -> s1       50 Mbit/s link | rx   0.0%   0.02 Mbit/s | tx  14.5%   7.25 Mbit/s
+23:49:29 telemetry: h8   seq=15    received=15    lost=0   loss=0.0%
+23:49:29 telemetry: h7   seq=15    received=15    lost=0   loss=0.0%
+23:49:29 telemetry: h2   seq=15    received=15    lost=0   loss=0.0%
+23:49:29 telemetry: h5   seq=15    received=15    lost=0   loss=0.0%
+23:49:29 telemetry: h4   seq=15    received=15    lost=0   loss=0.0%
+23:49:29 telemetry: h12  seq=15    received=15    lost=0   loss=0.0%
+23:49:29 telemetry: h3   seq=15    received=15    lost=0   loss=0.0%
+23:49:29 telemetry: h10  seq=15    received=15    lost=0   loss=0.0%
+23:49:29 telemetry: h9   seq=15    received=15    lost=0   loss=0.0%
+23:49:29 telemetry: h6   seq=15    received=15    lost=0   loss=0.0%
+23:49:29 telemetry: h11  seq=15    received=15    lost=0   loss=0.0%
+23:49:29 telemetry: h1   seq=15    received=15    lost=0   loss=0.0%
+23:49:30 util: s7-eth4  -> s3       50 Mbit/s link | rx  20.0%  10.00 Mbit/s | tx   0.0%   0.01 Mbit/s
+23:49:30 util: s7-eth2  -> h11     100 Mbit/s link | rx   0.0%   0.01 Mbit/s | tx  10.0%  10.00 Mbit/s
+23:49:30 util: s1-eth1  -> s2       50 Mbit/s link | rx  20.1%  10.05 Mbit/s | tx   0.0%   0.01 Mbit/s
+23:49:30 util: s1-eth2  -> s3       10 Mbit/s link | rx   0.1%   0.01 Mbit/s | tx 100.0%  10.00 Mbit/s
+23:49:30 ALERT CRITICAL utilization s1->s3: s1-eth2 tx 100.0% of 10 Mbit/s (10.00 Mbit/s)
+23:49:30 util: s4-eth4  -> s2       50 Mbit/s link | rx   0.0%   0.01 Mbit/s | tx  20.1%  10.04 Mbit/s
+23:49:30 util: s4-eth1  -> h1      100 Mbit/s link | rx  10.0%  10.04 Mbit/s | tx   0.0%   0.01 Mbit/s
+23:49:30 util: s2-eth1  -> s4       50 Mbit/s link | rx  20.1%  10.04 Mbit/s | tx   0.0%   0.01 Mbit/s
+23:49:30 util: s2-eth3  -> s1       50 Mbit/s link | rx   0.0%   0.01 Mbit/s | tx  20.1%  10.04 Mbit/s
+23:49:30 util: s3-eth2  -> s7       50 Mbit/s link | rx   0.0%   0.01 Mbit/s | tx  20.0%  10.00 Mbit/s
+23:49:30 util: s3-eth3  -> s1       10 Mbit/s link | rx 100.0%  10.00 Mbit/s | tx   0.1%   0.01 Mbit/s
+23:49:31 telemetry: h8   seq=16    received=16    lost=0   loss=0.0%
+23:49:31 telemetry: h7   seq=16    received=16    lost=0   loss=0.0%
+23:49:31 telemetry: h2   seq=16    received=16    lost=0   loss=0.0%
+23:49:31 telemetry: h5   seq=16    received=16    lost=0   loss=0.0%
+23:49:31 telemetry: h4   seq=16    received=16    lost=0   loss=0.0%
+23:49:31 telemetry: h12  seq=16    received=16    lost=0   loss=0.0%
+23:49:31 telemetry: h3   seq=16    received=16    lost=0   loss=0.0%
+23:49:31 telemetry: h1   seq=16    received=16    lost=0   loss=0.0%
+23:49:31 telemetry: h10  seq=16    received=16    lost=0   loss=0.0%
+23:49:31 telemetry: h9   seq=16    received=16    lost=0   loss=0.0%
+23:49:31 telemetry: h6   seq=16    received=16    lost=0   loss=0.0%
+23:49:31 telemetry: h11  seq=16    received=16    lost=0   loss=0.0%
+23:49:32 util: s7-eth4  -> s3       50 Mbit/s link | rx  16.9%   8.46 Mbit/s | tx   0.0%   0.01 Mbit/s
+23:49:32 util: s7-eth2  -> h11     100 Mbit/s link | rx   0.0%   0.01 Mbit/s | tx   8.5%   8.46 Mbit/s
+23:49:32 util: s1-eth1  -> s2       50 Mbit/s link | rx  16.4%   8.18 Mbit/s | tx   0.0%   0.01 Mbit/s
+23:49:32 util: s1-eth2  -> s3       10 Mbit/s link | rx   0.1%   0.01 Mbit/s | tx  84.6%   8.46 Mbit/s
+23:49:32 util: s4-eth4  -> s2       50 Mbit/s link | rx   0.0%   0.01 Mbit/s | tx  16.3%   8.17 Mbit/s
+23:49:32 util: s4-eth1  -> h1      100 Mbit/s link | rx   8.2%   8.17 Mbit/s | tx   0.0%   0.01 Mbit/s
+23:49:32 util: s3-eth2  -> s7       50 Mbit/s link | rx   0.0%   0.01 Mbit/s | tx  16.9%   8.46 Mbit/s
+23:49:32 util: s3-eth3  -> s1       10 Mbit/s link | rx  84.6%   8.46 Mbit/s | tx   0.1%   0.01 Mbit/s
+23:49:32 util: s2-eth1  -> s4       50 Mbit/s link | rx  16.4%   8.18 Mbit/s | tx   0.0%   0.01 Mbit/s
+23:49:32 util: s2-eth3  -> s1       50 Mbit/s link | rx   0.0%   0.01 Mbit/s | tx  16.4%   8.18 Mbit/s
+23:49:33 telemetry: h8   seq=17    received=17    lost=0   loss=0.0%
+23:49:33 telemetry: h7   seq=17    received=17    lost=0   loss=0.0%
+23:49:33 telemetry: h2   seq=17    received=17    lost=0   loss=0.0%
+23:49:33 telemetry: h4   seq=17    received=17    lost=0   loss=0.0%
+23:49:33 telemetry: h5   seq=17    received=17    lost=0   loss=0.0%
+23:49:33 telemetry: h12  seq=17    received=17    lost=0   loss=0.0%
+23:49:33 telemetry: h3   seq=17    received=17    lost=0   loss=0.0%
+23:49:33 telemetry: h1   seq=17    received=17    lost=0   loss=0.0%
+23:49:33 telemetry: h10  seq=17    received=17    lost=0   loss=0.0%
+23:49:33 telemetry: h9   seq=17    received=17    lost=0   loss=0.0%
+23:49:33 telemetry: h6   seq=17    received=17    lost=0   loss=0.0%
+23:49:33 telemetry: h11  seq=17    received=17    lost=0   loss=0.0%
+23:49:35 telemetry: h8   seq=18    received=18    lost=0   loss=0.0%
+23:49:35 telemetry: h7   seq=18    received=18    lost=0   loss=0.0%
+23:49:35 telemetry: h2   seq=18    received=18    lost=0   loss=0.0%
+23:49:35 telemetry: h5   seq=18    received=18    lost=0   loss=0.0%
+23:49:35 telemetry: h4   seq=18    received=18    lost=0   loss=0.0%
+23:49:35 telemetry: h12  seq=18    received=18    lost=0   loss=0.0%
+23:49:35 telemetry: h3   seq=18    received=18    lost=0   loss=0.0%
+23:49:35 telemetry: h1   seq=18    received=18    lost=0   loss=0.0%
+23:49:35 telemetry: h10  seq=18    received=18    lost=0   loss=0.0%
+23:49:35 telemetry: h9   seq=18    received=18    lost=0   loss=0.0%
+23:49:35 telemetry: h6   seq=18    received=18    lost=0   loss=0.0%
+23:49:35 telemetry: h11  seq=18    received=18    lost=0   loss=0.0%
+23:49:37 telemetry: h8   seq=19    received=19    lost=0   loss=0.0%
+23:49:37 telemetry: h7   seq=19    received=19    lost=0   loss=0.0%
+23:49:37 telemetry: h2   seq=19    received=19    lost=0   loss=0.0%
+23:49:37 telemetry: h5   seq=19    received=19    lost=0   loss=0.0%
+23:49:37 telemetry: h4   seq=19    received=19    lost=0   loss=0.0%
+23:49:37 telemetry: h12  seq=19    received=19    lost=0   loss=0.0%
+23:49:37 telemetry: h3   seq=19    received=19    lost=0   loss=0.0%
+23:49:37 telemetry: h1   seq=19    received=19    lost=0   loss=0.0%
+23:49:37 telemetry: h10  seq=19    received=19    lost=0   loss=0.0%
+23:49:37 telemetry: h9   seq=19    received=19    lost=0   loss=0.0%
+23:49:37 telemetry: h6   seq=19    received=19    lost=0   loss=0.0%
+23:49:37 telemetry: h11  seq=19    received=19    lost=0   loss=0.0%
+23:49:39 telemetry: h8   seq=20    received=20    lost=0   loss=0.0%
+23:49:39 telemetry: h7   seq=20    received=20    lost=0   loss=0.0%
+23:49:39 telemetry: h2   seq=20    received=20    lost=0   loss=0.0%
+23:49:39 telemetry: h4   seq=20    received=20    lost=0   loss=0.0%
+23:49:39 telemetry: h5   seq=20    received=20    lost=0   loss=0.0%
+23:49:39 telemetry: h3   seq=20    received=20    lost=0   loss=0.0%
+23:49:39 telemetry: h12  seq=20    received=20    lost=0   loss=0.0%
+23:49:39 telemetry: h1   seq=20    received=20    lost=0   loss=0.0%
+23:49:39 telemetry: h10  seq=20    received=20    lost=0   loss=0.0%
+23:49:39 telemetry: h9   seq=20    received=20    lost=0   loss=0.0%
+23:49:39 telemetry: h6   seq=20    received=20    lost=0   loss=0.0%
+23:49:39 telemetry: h11  seq=20    received=20    lost=0   loss=0.0%
+23:49:41 telemetry: h8   seq=21    received=21    lost=0   loss=0.0%
+23:49:41 telemetry: h7   seq=21    received=21    lost=0   loss=0.0%
+23:49:41 telemetry: h2   seq=21    received=21    lost=0   loss=0.0%
+23:49:41 telemetry: h5   seq=21    received=21    lost=0   loss=0.0%
+23:49:41 telemetry: h4   seq=21    received=21    lost=0   loss=0.0%
+23:49:41 telemetry: h3   seq=21    received=21    lost=0   loss=0.0%
+23:49:41 telemetry: h12  seq=21    received=21    lost=0   loss=0.0%
+23:49:41 telemetry: h1   seq=21    received=21    lost=0   loss=0.0%
+23:49:41 telemetry: h10  seq=21    received=21    lost=0   loss=0.0%
+23:49:41 telemetry: h9   seq=21    received=21    lost=0   loss=0.0%
+23:49:41 telemetry: h6   seq=21    received=21    lost=0   loss=0.0%
+23:49:41 telemetry: h11  seq=21    received=21    lost=0   loss=0.0%
+23:49:42 ALERT RESOLVED utilization s1->s3: s1-eth2 tx 0.0% of 10 Mbit/s (0.00 Mbit/s), under 70% for 10 s (alert lasted 12 s)
+23:49:43 telemetry: h8   seq=22    received=22    lost=0   loss=0.0%
+23:49:43 telemetry: h7   seq=22    received=22    lost=0   loss=0.0%
+23:49:43 telemetry: h2   seq=22    received=22    lost=0   loss=0.0%
+23:49:43 telemetry: h5   seq=22    received=22    lost=0   loss=0.0%
+23:49:43 telemetry: h4   seq=22    received=22    lost=0   loss=0.0%
+23:49:43 telemetry: h12  seq=22    received=22    lost=0   loss=0.0%
+23:49:43 telemetry: h3   seq=22    received=22    lost=0   loss=0.0%
+23:49:43 telemetry: h1   seq=22    received=22    lost=0   loss=0.0%
+23:49:43 telemetry: h10  seq=22    received=22    lost=0   loss=0.0%
+23:49:43 telemetry: h9   seq=22    received=22    lost=0   loss=0.0%
+23:49:43 telemetry: h6   seq=22    received=22    lost=0   loss=0.0%
+23:49:43 telemetry: h11  seq=22    received=22    lost=0   loss=0.0%
+23:49:45 telemetry: h8   seq=23    received=23    lost=0   loss=0.0%
+23:49:45 telemetry: h7   seq=23    received=23    lost=0   loss=0.0%
+23:49:45 telemetry: h2   seq=23    received=23    lost=0   loss=0.0%
+23:49:45 telemetry: h5   seq=23    received=23    lost=0   loss=0.0%
+23:49:45 telemetry: h4   seq=23    received=23    lost=0   loss=0.0%
+23:49:45 telemetry: h12  seq=23    received=23    lost=0   loss=0.0%
+23:49:45 telemetry: h3   seq=23    received=23    lost=0   loss=0.0%
+23:49:45 telemetry: h1   seq=23    received=23    lost=0   loss=0.0%
+23:49:45 telemetry: h10  seq=23    received=23    lost=0   loss=0.0%
+23:49:45 telemetry: h9   seq=23    received=23    lost=0   loss=0.0%
+23:49:45 telemetry: h6   seq=23    received=23    lost=0   loss=0.0%
+23:49:45 telemetry: h11  seq=23    received=23    lost=0   loss=0.0%
+23:49:47 telemetry: h8   seq=24    received=24    lost=0   loss=0.0%
+23:49:47 telemetry: h7   seq=24    received=24    lost=0   loss=0.0%
+23:49:47 telemetry: h4   seq=24    received=24    lost=0   loss=0.0%
+23:49:47 telemetry: h5   seq=24    received=24    lost=0   loss=0.0%
+23:49:47 telemetry: h12  seq=24    received=24    lost=0   loss=0.0%
+23:49:47 telemetry: h10  seq=24    received=24    lost=0   loss=0.0%
+23:49:47 telemetry: h9   seq=24    received=24    lost=0   loss=0.0%
+23:49:47 telemetry: h6   seq=24    received=24    lost=0   loss=0.0%
+23:49:47 telemetry: h11  seq=24    received=24    lost=0   loss=0.0%
+23:49:47 telemetry: h2   seq=24    received=24    lost=0   loss=0.0%
+23:49:47 telemetry: h3   seq=24    received=24    lost=0   loss=0.0%
+23:49:47 telemetry: h1   seq=24    received=24    lost=0   loss=0.0%
+23:49:48 util: s4-eth4  -> s2       50 Mbit/s link | rx   0.0%   0.02 Mbit/s | tx  68.8%  34.40 Mbit/s
+23:49:48 util: s4-eth1  -> h1      100 Mbit/s link | rx  34.7%  34.74 Mbit/s | tx   0.0%   0.02 Mbit/s
+23:49:48 util: s2-eth1  -> s4       50 Mbit/s link | rx  68.8%  34.41 Mbit/s | tx   0.0%   0.02 Mbit/s
+23:49:48 util: s2-eth2  -> s5       50 Mbit/s link | rx   0.0%   0.02 Mbit/s | tx  68.8%  34.40 Mbit/s
+23:49:48 util: s5-eth4  -> s2       50 Mbit/s link | rx  68.8%  34.40 Mbit/s | tx   0.0%   0.02 Mbit/s
+23:49:48 util: s5-eth1  -> h4      100 Mbit/s link | rx   0.0%   0.02 Mbit/s | tx  34.4%  34.40 Mbit/s
+23:49:49 telemetry: h8   seq=25    received=25    lost=0   loss=0.0%
+23:49:49 telemetry: h7   seq=25    received=25    lost=0   loss=0.0%
+23:49:49 telemetry: h5   seq=25    received=25    lost=0   loss=0.0%
+23:49:49 telemetry: h4   seq=25    received=25    lost=0   loss=0.0%
+23:49:49 telemetry: h12  seq=25    received=25    lost=0   loss=0.0%
+23:49:49 telemetry: h10  seq=25    received=25    lost=0   loss=0.0%
+23:49:49 telemetry: h9   seq=25    received=25    lost=0   loss=0.0%
+23:49:49 telemetry: h6   seq=25    received=25    lost=0   loss=0.0%
+23:49:49 telemetry: h11  seq=25    received=25    lost=0   loss=0.0%
+23:49:49 telemetry: h2   seq=25    received=25    lost=0   loss=0.0%
+23:49:49 telemetry: h3   seq=25    received=25    lost=0   loss=0.0%
+23:49:49 telemetry: h1   seq=25    received=25    lost=0   loss=0.0%
+23:49:50 util: s4-eth4  -> s2       50 Mbit/s link | rx   0.0%   0.01 Mbit/s | tx 100.0%  50.01 Mbit/s
+23:49:50 ALERT CRITICAL utilization s4->s2: s4-eth4 tx 100.0% of 50 Mbit/s (50.01 Mbit/s)
+23:49:50 util: s4-eth1  -> h1      100 Mbit/s link | rx  50.0%  50.01 Mbit/s | tx   0.0%   0.00 Mbit/s
+23:49:50 util: s5-eth4  -> s2       50 Mbit/s link | rx 100.0%  50.01 Mbit/s | tx   0.0%   0.01 Mbit/s
+23:49:50 util: s5-eth1  -> h4      100 Mbit/s link | rx   0.0%   0.01 Mbit/s | tx  50.0%  50.01 Mbit/s
+23:49:50 util: s2-eth1  -> s4       50 Mbit/s link | rx 100.0%  50.01 Mbit/s | tx   0.0%   0.01 Mbit/s
+23:49:50 util: s2-eth2  -> s5       50 Mbit/s link | rx   0.0%   0.01 Mbit/s | tx 100.0%  50.01 Mbit/s
+23:49:50 ALERT CRITICAL utilization s2->s5: s2-eth2 tx 100.0% of 50 Mbit/s (50.01 Mbit/s)
+23:49:51 telemetry: h8   seq=26    received=26    lost=0   loss=0.0%
+23:49:51 telemetry: h7   seq=26    received=26    lost=0   loss=0.0%
+23:49:51 telemetry: h5   seq=26    received=26    lost=0   loss=0.0%
+23:49:51 telemetry: h4   seq=26    received=26    lost=0   loss=0.0%
+23:49:51 telemetry: h12  seq=26    received=26    lost=0   loss=0.0%
+23:49:51 telemetry: h10  seq=26    received=26    lost=0   loss=0.0%
+23:49:51 telemetry: h9   seq=26    received=26    lost=0   loss=0.0%
+23:49:51 telemetry: h6   seq=26    received=26    lost=0   loss=0.0%
+23:49:51 telemetry: h11  seq=26    received=26    lost=0   loss=0.0%
+23:49:51 telemetry: h2   seq=26    received=26    lost=0   loss=0.0%
+23:49:51 telemetry: h3   seq=26    received=26    lost=0   loss=0.0%
+23:49:51 telemetry: h1   seq=26    received=26    lost=0   loss=0.0%
+23:49:52 util: s4-eth4  -> s2       50 Mbit/s link | rx   0.0%   0.01 Mbit/s | tx  82.6%  41.28 Mbit/s
+23:49:52 util: s4-eth1  -> h1      100 Mbit/s link | rx  40.9%  40.93 Mbit/s | tx   0.0%   0.01 Mbit/s
+23:49:52 util: s2-eth1  -> s4       50 Mbit/s link | rx  82.5%  41.27 Mbit/s | tx   0.0%   0.01 Mbit/s
+23:49:52 util: s2-eth2  -> s5       50 Mbit/s link | rx   0.0%   0.01 Mbit/s | tx  82.5%  41.26 Mbit/s
+23:49:52 util: s5-eth4  -> s2       50 Mbit/s link | rx  82.5%  41.26 Mbit/s | tx   0.0%   0.01 Mbit/s
+23:49:52 util: s5-eth1  -> h4      100 Mbit/s link | rx   0.0%   0.01 Mbit/s | tx  41.3%  41.26 Mbit/s
+23:49:53 telemetry: h8   seq=27    received=27    lost=0   loss=0.0%
+23:49:53 telemetry: h7   seq=27    received=27    lost=0   loss=0.0%
+23:49:53 telemetry: h2   seq=27    received=27    lost=0   loss=0.0%
+23:49:53 telemetry: h5   seq=27    received=27    lost=0   loss=0.0%
+23:49:53 telemetry: h4   seq=27    received=27    lost=0   loss=0.0%
+23:49:53 telemetry: h12  seq=27    received=27    lost=0   loss=0.0%
+23:49:53 telemetry: h3   seq=27    received=27    lost=0   loss=0.0%
+23:49:53 telemetry: h1   seq=27    received=27    lost=0   loss=0.0%
+23:49:53 telemetry: h10  seq=27    received=27    lost=0   loss=0.0%
+23:49:53 telemetry: h9   seq=27    received=27    lost=0   loss=0.0%
+23:49:53 telemetry: h6   seq=27    received=27    lost=0   loss=0.0%
+23:49:53 telemetry: h11  seq=27    received=27    lost=0   loss=0.0%
+23:49:55 telemetry: h8   seq=28    received=28    lost=0   loss=0.0%
+23:49:55 telemetry: h7   seq=28    received=28    lost=0   loss=0.0%
+23:49:55 telemetry: h2   seq=28    received=28    lost=0   loss=0.0%
+23:49:55 telemetry: h4   seq=28    received=28    lost=0   loss=0.0%
+23:49:55 telemetry: h5   seq=28    received=28    lost=0   loss=0.0%
+23:49:55 telemetry: h12  seq=28    received=28    lost=0   loss=0.0%
+23:49:55 telemetry: h3   seq=28    received=28    lost=0   loss=0.0%
+23:49:55 telemetry: h1   seq=28    received=28    lost=0   loss=0.0%
+23:49:55 telemetry: h10  seq=28    received=28    lost=0   loss=0.0%
+23:49:55 telemetry: h9   seq=28    received=28    lost=0   loss=0.0%
+23:49:55 telemetry: h6   seq=28    received=28    lost=0   loss=0.0%
+23:49:55 telemetry: h11  seq=28    received=28    lost=0   loss=0.0%
+23:49:57 telemetry: h8   seq=29    received=29    lost=0   loss=0.0%
+23:49:57 telemetry: h7   seq=29    received=29    lost=0   loss=0.0%
+23:49:57 telemetry: h2   seq=29    received=29    lost=0   loss=0.0%
+23:49:57 telemetry: h4   seq=29    received=29    lost=0   loss=0.0%
+23:49:57 telemetry: h5   seq=29    received=29    lost=0   loss=0.0%
+23:49:57 telemetry: h12  seq=29    received=29    lost=0   loss=0.0%
+23:49:57 telemetry: h3   seq=29    received=29    lost=0   loss=0.0%
+23:49:57 telemetry: h1   seq=29    received=29    lost=0   loss=0.0%
+23:49:57 telemetry: h10  seq=29    received=29    lost=0   loss=0.0%
+23:49:57 telemetry: h9   seq=29    received=29    lost=0   loss=0.0%
+23:49:57 telemetry: h6   seq=29    received=29    lost=0   loss=0.0%
+23:49:57 telemetry: h11  seq=29    received=29    lost=0   loss=0.0%
+23:49:59 telemetry: h8   seq=30    received=30    lost=0   loss=0.0%
+23:49:59 telemetry: h7   seq=30    received=30    lost=0   loss=0.0%
+23:49:59 telemetry: h2   seq=30    received=30    lost=0   loss=0.0%
+23:49:59 telemetry: h5   seq=30    received=30    lost=0   loss=0.0%
+23:49:59 telemetry: h4   seq=30    received=30    lost=0   loss=0.0%
+23:49:59 telemetry: h3   seq=30    received=30    lost=0   loss=0.0%
+23:49:59 telemetry: h12  seq=30    received=30    lost=0   loss=0.0%
+23:49:59 telemetry: h1   seq=30    received=30    lost=0   loss=0.0%
+23:49:59 telemetry: h10  seq=30    received=30    lost=0   loss=0.0%
+23:49:59 telemetry: h9   seq=30    received=30    lost=0   loss=0.0%
+23:49:59 telemetry: h6   seq=30    received=30    lost=0   loss=0.0%
+23:49:59 telemetry: h11  seq=30    received=30    lost=0   loss=0.0%
+23:50:01 telemetry: h7   seq=31    received=31    lost=0   loss=0.0%
+23:50:01 telemetry: h8   seq=31    received=31    lost=0   loss=0.0%
+23:50:01 telemetry: h2   seq=31    received=31    lost=0   loss=0.0%
+23:50:01 telemetry: h5   seq=31    received=31    lost=0   loss=0.0%
+23:50:01 telemetry: h4   seq=31    received=31    lost=0   loss=0.0%
+23:50:01 telemetry: h12  seq=31    received=31    lost=0   loss=0.0%
+23:50:01 telemetry: h3   seq=31    received=31    lost=0   loss=0.0%
+23:50:01 telemetry: h1   seq=31    received=31    lost=0   loss=0.0%
+23:50:01 telemetry: h10  seq=31    received=31    lost=0   loss=0.0%
+23:50:01 telemetry: h9   seq=31    received=31    lost=0   loss=0.0%
+23:50:01 telemetry: h6   seq=31    received=31    lost=0   loss=0.0%
+23:50:01 telemetry: h11  seq=31    received=31    lost=0   loss=0.0%
+23:50:02 ALERT RESOLVED utilization s4->s2: s4-eth4 tx 0.0% of 50 Mbit/s (0.00 Mbit/s), under 70% for 10 s (alert lasted 12 s)
+23:50:02 ALERT RESOLVED utilization s2->s5: s2-eth2 tx 0.0% of 50 Mbit/s (0.00 Mbit/s), under 70% for 10 s (alert lasted 12 s)
+23:50:03 telemetry: h8   seq=32    received=32    lost=0   loss=0.0%
+23:50:03 telemetry: h7   seq=32    received=32    lost=0   loss=0.0%
+23:50:03 telemetry: h5   seq=32    received=32    lost=0   loss=0.0%
+23:50:03 telemetry: h2   seq=32    received=32    lost=0   loss=0.0%
+23:50:03 telemetry: h4   seq=32    received=32    lost=0   loss=0.0%
+23:50:03 telemetry: h12  seq=32    received=32    lost=0   loss=0.0%
+23:50:03 telemetry: h3   seq=32    received=32    lost=0   loss=0.0%
+23:50:03 telemetry: h1   seq=32    received=32    lost=0   loss=0.0%
+23:50:03 telemetry: h10  seq=32    received=32    lost=0   loss=0.0%
+23:50:03 telemetry: h9   seq=32    received=32    lost=0   loss=0.0%
+23:50:03 telemetry: h6   seq=32    received=32    lost=0   loss=0.0%
+23:50:03 telemetry: h11  seq=32    received=32    lost=0   loss=0.0%
+23:50:05 telemetry: h8   seq=33    received=33    lost=0   loss=0.0%
+23:50:05 telemetry: h7   seq=33    received=33    lost=0   loss=0.0%
+23:50:05 telemetry: h2   seq=33    received=33    lost=0   loss=0.0%
+23:50:05 telemetry: h5   seq=33    received=33    lost=0   loss=0.0%
+23:50:05 telemetry: h4   seq=33    received=33    lost=0   loss=0.0%
+23:50:05 telemetry: h12  seq=33    received=33    lost=0   loss=0.0%
+23:50:05 telemetry: h3   seq=33    received=33    lost=0   loss=0.0%
+23:50:05 telemetry: h1   seq=33    received=33    lost=0   loss=0.0%
+23:50:05 telemetry: h10  seq=33    received=33    lost=0   loss=0.0%
+23:50:05 telemetry: h9   seq=33    received=33    lost=0   loss=0.0%
+23:50:05 telemetry: h6   seq=33    received=33    lost=0   loss=0.0%
+23:50:05 telemetry: h11  seq=33    received=33    lost=0   loss=0.0%
+23:50:07 telemetry: h8   seq=34    received=34    lost=0   loss=0.0%
+23:50:07 telemetry: h7   seq=34    received=34    lost=0   loss=0.0%
+23:50:07 telemetry: h2   seq=34    received=34    lost=0   loss=0.0%
+23:50:07 telemetry: h5   seq=34    received=34    lost=0   loss=0.0%
+23:50:07 telemetry: h4   seq=34    received=34    lost=0   loss=0.0%
+23:50:07 telemetry: h12  seq=34    received=34    lost=0   loss=0.0%
+23:50:07 telemetry: h3   seq=34    received=34    lost=0   loss=0.0%
+23:50:07 telemetry: h1   seq=34    received=34    lost=0   loss=0.0%
+23:50:07 telemetry: h10  seq=34    received=34    lost=0   loss=0.0%
+23:50:07 telemetry: h9   seq=34    received=34    lost=0   loss=0.0%
+23:50:07 telemetry: h6   seq=34    received=34    lost=0   loss=0.0%
+23:50:07 telemetry: h11  seq=34    received=34    lost=0   loss=0.0%
+23:50:08 util: s4-eth2  -> h2      100 Mbit/s link | rx  22.3%  22.30 Mbit/s | tx   0.0%   0.00 Mbit/s
+23:50:08 util: s4-eth3  -> h3      100 Mbit/s link | rx   0.0%   0.00 Mbit/s | tx  22.3%  22.30 Mbit/s
+23:50:09 telemetry: h8   seq=35    received=35    lost=0   loss=0.0%
+23:50:09 telemetry: h7   seq=35    received=35    lost=0   loss=0.0%
+23:50:09 telemetry: h2   seq=35    received=35    lost=0   loss=0.0%
+23:50:09 telemetry: h5   seq=35    received=35    lost=0   loss=0.0%
+23:50:09 telemetry: h4   seq=35    received=35    lost=0   loss=0.0%
+23:50:09 telemetry: h12  seq=35    received=35    lost=0   loss=0.0%
+23:50:09 telemetry: h3   seq=35    received=35    lost=0   loss=0.0%
+23:50:09 telemetry: h1   seq=35    received=35    lost=0   loss=0.0%
+23:50:09 telemetry: h10  seq=35    received=35    lost=0   loss=0.0%
+23:50:09 telemetry: h9   seq=35    received=35    lost=0   loss=0.0%
+23:50:09 telemetry: h6   seq=35    received=35    lost=0   loss=0.0%
+23:50:09 telemetry: h11  seq=35    received=35    lost=0   loss=0.0%
+23:50:10 util: s4-eth2  -> h2      100 Mbit/s link | rx  32.6%  32.57 Mbit/s | tx   0.0%   0.00 Mbit/s
+23:50:10 util: s4-eth3  -> h3      100 Mbit/s link | rx   0.0%   0.00 Mbit/s | tx  32.6%  32.57 Mbit/s
+23:50:11 telemetry: h8   seq=36    received=36    lost=0   loss=0.0%
+23:50:11 telemetry: h7   seq=36    received=36    lost=0   loss=0.0%
+23:50:11 telemetry: h2   seq=36    received=36    lost=0   loss=0.0%
+23:50:11 telemetry: h4   seq=36    received=36    lost=0   loss=0.0%
+23:50:11 telemetry: h5   seq=36    received=36    lost=0   loss=0.0%
+23:50:11 telemetry: h12  seq=36    received=36    lost=0   loss=0.0%
+23:50:11 telemetry: h3   seq=36    received=36    lost=0   loss=0.0%
+23:50:11 telemetry: h1   seq=36    received=36    lost=0   loss=0.0%
+23:50:11 telemetry: h10  seq=36    received=36    lost=0   loss=0.0%
+23:50:11 telemetry: h9   seq=36    received=36    lost=0   loss=0.0%
+23:50:11 telemetry: h6   seq=36    received=36    lost=0   loss=0.0%
+23:50:11 telemetry: h11  seq=36    received=36    lost=0   loss=0.0%
+23:50:12 util: s4-eth2  -> h2      100 Mbit/s link | rx  32.6%  32.56 Mbit/s | tx   0.0%   0.00 Mbit/s
+23:50:12 util: s4-eth3  -> h3      100 Mbit/s link | rx   0.0%   0.00 Mbit/s | tx  32.6%  32.56 Mbit/s
+23:50:13 telemetry: h8   seq=37    received=37    lost=0   loss=0.0%
+23:50:13 telemetry: h7   seq=37    received=37    lost=0   loss=0.0%
+23:50:13 telemetry: h2   seq=37    received=37    lost=0   loss=0.0%
+23:50:13 telemetry: h5   seq=37    received=37    lost=0   loss=0.0%
+23:50:13 telemetry: h4   seq=37    received=37    lost=0   loss=0.0%
+23:50:13 telemetry: h3   seq=37    received=37    lost=0   loss=0.0%
+23:50:13 telemetry: h12  seq=37    received=37    lost=0   loss=0.0%
+23:50:13 telemetry: h1   seq=37    received=37    lost=0   loss=0.0%
+23:50:13 telemetry: h10  seq=37    received=37    lost=0   loss=0.0%
+23:50:13 telemetry: h9   seq=37    received=37    lost=0   loss=0.0%
+23:50:13 telemetry: h6   seq=37    received=37    lost=0   loss=0.0%
+23:50:13 telemetry: h11  seq=37    received=37    lost=0   loss=0.0%
+23:50:14 util: s4-eth2  -> h2      100 Mbit/s link | rx  32.6%  32.56 Mbit/s | tx   0.0%   0.00 Mbit/s
+23:50:14 util: s4-eth3  -> h3      100 Mbit/s link | rx   0.0%   0.00 Mbit/s | tx  32.6%  32.56 Mbit/s
+23:50:15 telemetry: h8   seq=38    received=38    lost=0   loss=0.0%
+23:50:15 telemetry: h7   seq=38    received=38    lost=0   loss=0.0%
+23:50:15 telemetry: h2   seq=38    received=38    lost=0   loss=0.0%
+23:50:15 telemetry: h5   seq=38    received=38    lost=0   loss=0.0%
+23:50:15 telemetry: h4   seq=38    received=38    lost=0   loss=0.0%
+23:50:15 telemetry: h3   seq=38    received=38    lost=0   loss=0.0%
+23:50:15 telemetry: h12  seq=38    received=38    lost=0   loss=0.0%
+23:50:15 telemetry: h1   seq=38    received=38    lost=0   loss=0.0%
+23:50:15 telemetry: h10  seq=38    received=38    lost=0   loss=0.0%
+23:50:15 telemetry: h9   seq=38    received=38    lost=0   loss=0.0%
+23:50:15 telemetry: h6   seq=38    received=38    lost=0   loss=0.0%
+23:50:15 telemetry: h11  seq=38    received=38    lost=0   loss=0.0%
+23:50:16 util: s4-eth2  -> h2      100 Mbit/s link | rx  32.5%  32.55 Mbit/s | tx   0.0%   0.00 Mbit/s
+23:50:16 util: s4-eth3  -> h3      100 Mbit/s link | rx   0.0%   0.00 Mbit/s | tx  32.5%  32.55 Mbit/s
+23:50:17 telemetry: h8   seq=39    received=39    lost=0   loss=0.0%
+23:50:17 telemetry: h7   seq=39    received=39    lost=0   loss=0.0%
+23:50:17 telemetry: h2   seq=39    received=39    lost=0   loss=0.0%
+23:50:17 telemetry: h5   seq=39    received=39    lost=0   loss=0.0%
+23:50:17 telemetry: h4   seq=39    received=39    lost=0   loss=0.0%
+23:50:17 telemetry: h12  seq=39    received=39    lost=0   loss=0.0%
+23:50:17 telemetry: h3   seq=39    received=39    lost=0   loss=0.0%
+23:50:17 telemetry: h10  seq=39    received=39    lost=0   loss=0.0%
+23:50:17 telemetry: h9   seq=39    received=39    lost=0   loss=0.0%
+23:50:17 telemetry: h6   seq=39    received=39    lost=0   loss=0.0%
+23:50:17 telemetry: h11  seq=39    received=39    lost=0   loss=0.0%
+23:50:17 telemetry: h1   seq=39    received=39    lost=0   loss=0.0%
+23:50:18 util: s4-eth1  -> h1      100 Mbit/s link | rx  67.6%  67.64 Mbit/s | tx   0.0%   0.02 Mbit/s
+23:50:18 ALERT CRITICAL unexplained h1: traffic not explained by the application: s4-eth1 rx 67.64 Mbit/s (67.6% of 100 Mbit/s), agent sent 0.8 kbit/s (0.00%)
+23:50:18 MITIGATION h1: installed on s4-eth1 for 30 s: drop everything from h1 except telemetry (udp 10.0.0.100:9999) and arp for 10.0.0.100, sent out s4-eth4
+23:50:18 util: s4-eth2  -> h2      100 Mbit/s link | rx  10.2%  10.18 Mbit/s | tx   0.0%   0.00 Mbit/s
+23:50:18 util: s4-eth3  -> h3      100 Mbit/s link | rx   0.0%   0.02 Mbit/s | tx  77.8%  77.82 Mbit/s
+23:50:18 ALERT WARNING  utilization s4->h3: s4-eth3 tx 77.8% of 100 Mbit/s (77.82 Mbit/s)
+23:50:19 telemetry: h8   seq=40    received=40    lost=0   loss=0.0%
+23:50:19 telemetry: h7   seq=40    received=40    lost=0   loss=0.0%
+23:50:19 telemetry: h2   seq=40    received=40    lost=0   loss=0.0%
+23:50:19 telemetry: h5   seq=40    received=40    lost=0   loss=0.0%
+23:50:19 telemetry: h4   seq=40    received=40    lost=0   loss=0.0%
+23:50:19 telemetry: h12  seq=40    received=40    lost=0   loss=0.0%
+23:50:19 telemetry: h3   seq=40    received=40    lost=0   loss=0.0%
+23:50:19 telemetry: h10  seq=40    received=40    lost=0   loss=0.0%
+23:50:19 telemetry: h9   seq=40    received=40    lost=0   loss=0.0%
+23:50:19 telemetry: h6   seq=40    received=40    lost=0   loss=0.0%
+23:50:19 telemetry: h11  seq=40    received=40    lost=0   loss=0.0%
+23:50:19 telemetry: h1   seq=40    received=40    lost=0   loss=0.0%
+23:50:20 util: s4-eth1  -> h1      100 Mbit/s link | rx 100.0% 100.01 Mbit/s | tx   0.0%   0.00 Mbit/s
+23:50:20 ALERT CRITICAL utilization h1->s4: s4-eth1 rx 100.0% of 100 Mbit/s (100.01 Mbit/s)
+23:50:21 telemetry: h8   seq=41    received=41    lost=0   loss=0.0%
+23:50:21 telemetry: h7   seq=41    received=41    lost=0   loss=0.0%
+23:50:21 telemetry: h2   seq=41    received=41    lost=0   loss=0.0%
+23:50:21 telemetry: h4   seq=41    received=41    lost=0   loss=0.0%
+23:50:21 telemetry: h5   seq=41    received=41    lost=0   loss=0.0%
+23:50:21 telemetry: h12  seq=41    received=41    lost=0   loss=0.0%
+23:50:21 telemetry: h3   seq=41    received=41    lost=0   loss=0.0%
+23:50:21 telemetry: h10  seq=41    received=41    lost=0   loss=0.0%
+23:50:21 telemetry: h9   seq=41    received=41    lost=0   loss=0.0%
+23:50:21 telemetry: h6   seq=41    received=41    lost=0   loss=0.0%
+23:50:21 telemetry: h11  seq=41    received=41    lost=0   loss=0.0%
+23:50:21 telemetry: h1   seq=41    received=41    lost=0   loss=0.0%
+23:50:22 util: s4-eth1  -> h1      100 Mbit/s link | rx 100.0% 100.01 Mbit/s | tx   0.0%   0.00 Mbit/s
+23:50:22 util: s4-eth2  -> h2      100 Mbit/s link | rx   5.7%   5.65 Mbit/s | tx   0.0%   0.00 Mbit/s
+23:50:22 util: s4-eth3  -> h3      100 Mbit/s link | rx   0.0%   0.00 Mbit/s | tx   5.7%   5.65 Mbit/s
+23:50:23 telemetry: h8   seq=42    received=42    lost=0   loss=0.0%
+23:50:23 telemetry: h7   seq=42    received=42    lost=0   loss=0.0%
+23:50:23 telemetry: h2   seq=42    received=42    lost=0   loss=0.0%
+23:50:23 telemetry: h5   seq=42    received=42    lost=0   loss=0.0%
+23:50:23 telemetry: h4   seq=42    received=42    lost=0   loss=0.0%
+23:50:23 telemetry: h3   seq=42    received=42    lost=0   loss=0.0%
+23:50:23 telemetry: h12  seq=42    received=42    lost=0   loss=0.0%
+23:50:23 telemetry: h10  seq=42    received=42    lost=0   loss=0.0%
+23:50:23 telemetry: h9   seq=42    received=42    lost=0   loss=0.0%
+23:50:23 telemetry: h6   seq=42    received=42    lost=0   loss=0.0%
+23:50:23 telemetry: h11  seq=42    received=42    lost=0   loss=0.0%
+23:50:23 telemetry: h1   seq=42    received=42    lost=0   loss=0.0%
+23:50:24 util: s4-eth1  -> h1      100 Mbit/s link | rx 100.0% 100.00 Mbit/s | tx   0.0%   0.00 Mbit/s
+23:50:24 util: s4-eth2  -> h2      100 Mbit/s link | rx  32.6%  32.56 Mbit/s | tx   0.0%   0.00 Mbit/s
+23:50:24 util: s4-eth3  -> h3      100 Mbit/s link | rx   0.0%   0.00 Mbit/s | tx  32.6%  32.56 Mbit/s
+23:50:25 telemetry: h8   seq=43    received=43    lost=0   loss=0.0%
+23:50:25 telemetry: h7   seq=43    received=43    lost=0   loss=0.0%
+23:50:25 telemetry: h2   seq=43    received=43    lost=0   loss=0.0%
+23:50:25 telemetry: h5   seq=43    received=43    lost=0   loss=0.0%
+23:50:25 telemetry: h4   seq=43    received=43    lost=0   loss=0.0%
+23:50:25 telemetry: h12  seq=43    received=43    lost=0   loss=0.0%
+23:50:25 telemetry: h3   seq=43    received=43    lost=0   loss=0.0%
+23:50:25 telemetry: h10  seq=43    received=43    lost=0   loss=0.0%
+23:50:25 telemetry: h9   seq=43    received=43    lost=0   loss=0.0%
+23:50:25 telemetry: h6   seq=43    received=43    lost=0   loss=0.0%
+23:50:25 telemetry: h11  seq=43    received=43    lost=0   loss=0.0%
+23:50:25 telemetry: h1   seq=43    received=43    lost=0   loss=0.0%
+23:50:26 util: s4-eth1  -> h1      100 Mbit/s link | rx  51.2%  51.21 Mbit/s | tx   0.0%   0.00 Mbit/s
+23:50:26 util: s4-eth2  -> h2      100 Mbit/s link | rx  32.6%  32.56 Mbit/s | tx   0.0%   0.00 Mbit/s
+23:50:26 util: s4-eth3  -> h3      100 Mbit/s link | rx   0.0%   0.00 Mbit/s | tx  32.6%  32.56 Mbit/s
+23:50:27 telemetry: h8   seq=44    received=44    lost=0   loss=0.0%
+23:50:27 telemetry: h7   seq=44    received=44    lost=0   loss=0.0%
+23:50:27 telemetry: h2   seq=44    received=44    lost=0   loss=0.0%
+23:50:27 telemetry: h4   seq=44    received=44    lost=0   loss=0.0%
+23:50:27 telemetry: h5   seq=44    received=44    lost=0   loss=0.0%
+23:50:27 telemetry: h12  seq=44    received=44    lost=0   loss=0.0%
+23:50:27 telemetry: h3   seq=44    received=44    lost=0   loss=0.0%
+23:50:27 telemetry: h1   seq=44    received=44    lost=0   loss=0.0%
+23:50:27 telemetry: h10  seq=44    received=44    lost=0   loss=0.0%
+23:50:27 telemetry: h9   seq=44    received=44    lost=0   loss=0.0%
+23:50:27 telemetry: h6   seq=44    received=44    lost=0   loss=0.0%
+23:50:27 telemetry: h11  seq=44    received=44    lost=0   loss=0.0%
+23:50:28 util: s4-eth2  -> h2      100 Mbit/s link | rx  32.5%  32.55 Mbit/s | tx   0.0%   0.00 Mbit/s
+23:50:28 util: s4-eth3  -> h3      100 Mbit/s link | rx   0.0%   0.00 Mbit/s | tx  32.5%  32.55 Mbit/s
+23:50:28 ALERT RESOLVED utilization s4->h3: s4-eth3 tx 32.5% of 100 Mbit/s (32.55 Mbit/s), under 70% for 10 s (alert lasted 10 s)
+23:50:29 telemetry: h8   seq=45    received=45    lost=0   loss=0.0%
+23:50:29 telemetry: h7   seq=45    received=45    lost=0   loss=0.0%
+23:50:29 telemetry: h2   seq=45    received=45    lost=0   loss=0.0%
+23:50:29 telemetry: h4   seq=45    received=45    lost=0   loss=0.0%
+23:50:29 telemetry: h5   seq=45    received=45    lost=0   loss=0.0%
+23:50:29 telemetry: h3   seq=45    received=45    lost=0   loss=0.0%
+23:50:29 telemetry: h12  seq=45    received=45    lost=0   loss=0.0%
+23:50:29 telemetry: h1   seq=45    received=45    lost=0   loss=0.0%
+23:50:29 telemetry: h10  seq=45    received=45    lost=0   loss=0.0%
+23:50:29 telemetry: h9   seq=45    received=45    lost=0   loss=0.0%
+23:50:29 telemetry: h6   seq=45    received=45    lost=0   loss=0.0%
+23:50:29 telemetry: h11  seq=45    received=45    lost=0   loss=0.0%
+23:50:30 util: s4-eth2  -> h2      100 Mbit/s link | rx  32.6%  32.57 Mbit/s | tx   0.0%   0.00 Mbit/s
+23:50:30 util: s4-eth3  -> h3      100 Mbit/s link | rx   0.0%   0.00 Mbit/s | tx  32.6%  32.57 Mbit/s
+23:50:31 telemetry: h8   seq=46    received=46    lost=0   loss=0.0%
+23:50:31 telemetry: h7   seq=46    received=46    lost=0   loss=0.0%
+23:50:31 telemetry: h2   seq=46    received=46    lost=0   loss=0.0%
+23:50:31 telemetry: h5   seq=46    received=46    lost=0   loss=0.0%
+23:50:31 telemetry: h4   seq=46    received=46    lost=0   loss=0.0%
+23:50:31 telemetry: h12  seq=46    received=46    lost=0   loss=0.0%
+23:50:31 telemetry: h3   seq=46    received=46    lost=0   loss=0.0%
+23:50:31 telemetry: h1   seq=46    received=46    lost=0   loss=0.0%
+23:50:31 telemetry: h10  seq=46    received=46    lost=0   loss=0.0%
+23:50:31 telemetry: h9   seq=46    received=46    lost=0   loss=0.0%
+23:50:31 telemetry: h6   seq=46    received=46    lost=0   loss=0.0%
+23:50:31 telemetry: h11  seq=46    received=46    lost=0   loss=0.0%
+23:50:32 util: s4-eth2  -> h2      100 Mbit/s link | rx  26.8%  26.79 Mbit/s | tx   0.0%   0.00 Mbit/s
+23:50:32 util: s4-eth3  -> h3      100 Mbit/s link | rx   0.0%   0.00 Mbit/s | tx  26.8%  26.79 Mbit/s
+23:50:33 telemetry: h8   seq=47    received=47    lost=0   loss=0.0%
+23:50:33 telemetry: h7   seq=47    received=47    lost=0   loss=0.0%
+23:50:33 telemetry: h2   seq=47    received=47    lost=0   loss=0.0%
+23:50:33 telemetry: h5   seq=47    received=47    lost=0   loss=0.0%
+23:50:33 telemetry: h4   seq=47    received=47    lost=0   loss=0.0%
+23:50:33 telemetry: h3   seq=47    received=47    lost=0   loss=0.0%
+23:50:33 telemetry: h12  seq=47    received=47    lost=0   loss=0.0%
+23:50:33 telemetry: h1   seq=47    received=47    lost=0   loss=0.0%
+23:50:33 telemetry: h10  seq=47    received=47    lost=0   loss=0.0%
+23:50:33 telemetry: h9   seq=47    received=47    lost=0   loss=0.0%
+23:50:33 telemetry: h6   seq=47    received=47    lost=0   loss=0.0%
+23:50:33 telemetry: h11  seq=47    received=47    lost=0   loss=0.0%
+23:50:34 ALERT RESOLVED utilization h1->s4: s4-eth1 rx 0.0% of 100 Mbit/s (0.00 Mbit/s), under 70% for 10 s (alert lasted 14 s)
+23:50:34 ALERT RESOLVED unexplained h1: s4-eth1 rx 0.00 Mbit/s (0.0% of 100 Mbit/s), agent sent 0.8 kbit/s (71.38%) (alert lasted 16 s)
+23:50:35 telemetry: h8   seq=48    received=48    lost=0   loss=0.0%
+23:50:35 telemetry: h7   seq=48    received=48    lost=0   loss=0.0%
+23:50:35 telemetry: h2   seq=48    received=48    lost=0   loss=0.0%
+23:50:35 telemetry: h4   seq=48    received=48    lost=0   loss=0.0%
+23:50:35 telemetry: h5   seq=48    received=48    lost=0   loss=0.0%
+23:50:35 telemetry: h3   seq=48    received=48    lost=0   loss=0.0%
+23:50:35 telemetry: h12  seq=48    received=48    lost=0   loss=0.0%
+23:50:35 telemetry: h1   seq=48    received=48    lost=0   loss=0.0%
+23:50:35 telemetry: h10  seq=48    received=48    lost=0   loss=0.0%
+23:50:35 telemetry: h9   seq=48    received=48    lost=0   loss=0.0%
+23:50:35 telemetry: h6   seq=48    received=48    lost=0   loss=0.0%
+23:50:35 telemetry: h11  seq=48    received=48    lost=0   loss=0.0%
+23:50:37 telemetry: h8   seq=49    received=49    lost=0   loss=0.0%
+23:50:37 telemetry: h7   seq=49    received=49    lost=0   loss=0.0%
+23:50:37 telemetry: h2   seq=49    received=49    lost=0   loss=0.0%
+23:50:37 telemetry: h5   seq=49    received=49    lost=0   loss=0.0%
+23:50:37 telemetry: h4   seq=49    received=49    lost=0   loss=0.0%
+23:50:37 telemetry: h12  seq=49    received=49    lost=0   loss=0.0%
+23:50:37 telemetry: h3   seq=49    received=49    lost=0   loss=0.0%
+23:50:37 telemetry: h1   seq=49    received=49    lost=0   loss=0.0%
+23:50:37 telemetry: h10  seq=49    received=49    lost=0   loss=0.0%
+23:50:37 telemetry: h9   seq=49    received=49    lost=0   loss=0.0%
+23:50:37 telemetry: h6   seq=49    received=49    lost=0   loss=0.0%
+23:50:37 telemetry: h11  seq=49    received=49    lost=0   loss=0.0%
+23:50:39 telemetry: h8   seq=50    received=50    lost=0   loss=0.0%
+23:50:39 telemetry: h7   seq=50    received=50    lost=0   loss=0.0%
+23:50:39 telemetry: h2   seq=50    received=50    lost=0   loss=0.0%
+23:50:39 telemetry: h5   seq=50    received=50    lost=0   loss=0.0%
+23:50:39 telemetry: h4   seq=50    received=50    lost=0   loss=0.0%
+23:50:39 telemetry: h12  seq=50    received=50    lost=0   loss=0.0%
+23:50:39 telemetry: h3   seq=50    received=50    lost=0   loss=0.0%
+23:50:39 telemetry: h1   seq=50    received=50    lost=0   loss=0.0%
+23:50:39 telemetry: h10  seq=50    received=50    lost=0   loss=0.0%
+23:50:39 telemetry: h9   seq=50    received=50    lost=0   loss=0.0%
+23:50:39 telemetry: h6   seq=50    received=50    lost=0   loss=0.0%
+23:50:39 telemetry: h11  seq=50    received=50    lost=0   loss=0.0%
+23:50:41 telemetry: h8   seq=51    received=51    lost=0   loss=0.0%
+23:50:41 telemetry: h7   seq=51    received=51    lost=0   loss=0.0%
+23:50:41 telemetry: h2   seq=51    received=51    lost=0   loss=0.0%
+23:50:41 telemetry: h5   seq=51    received=51    lost=0   loss=0.0%
+23:50:41 telemetry: h4   seq=51    received=51    lost=0   loss=0.0%
+23:50:41 telemetry: h12  seq=51    received=51    lost=0   loss=0.0%
+23:50:41 telemetry: h3   seq=51    received=51    lost=0   loss=0.0%
+23:50:41 telemetry: h1   seq=51    received=51    lost=0   loss=0.0%
+23:50:41 telemetry: h10  seq=51    received=51    lost=0   loss=0.0%
+23:50:41 telemetry: h9   seq=51    received=51    lost=0   loss=0.0%
+23:50:41 telemetry: h6   seq=51    received=51    lost=0   loss=0.0%
+23:50:41 telemetry: h11  seq=51    received=51    lost=0   loss=0.0%
+23:50:43 telemetry: h7   seq=52    received=52    lost=0   loss=0.0%
+23:50:43 telemetry: h8   seq=52    received=52    lost=0   loss=0.0%
+23:50:43 telemetry: h2   seq=52    received=52    lost=0   loss=0.0%
+23:50:43 telemetry: h5   seq=52    received=52    lost=0   loss=0.0%
+23:50:43 telemetry: h4   seq=52    received=52    lost=0   loss=0.0%
+23:50:43 telemetry: h12  seq=52    received=52    lost=0   loss=0.0%
+23:50:43 telemetry: h3   seq=52    received=52    lost=0   loss=0.0%
+23:50:43 telemetry: h1   seq=52    received=52    lost=0   loss=0.0%
+23:50:43 telemetry: h10  seq=52    received=52    lost=0   loss=0.0%
+23:50:43 telemetry: h9   seq=52    received=52    lost=0   loss=0.0%
+23:50:43 telemetry: h6   seq=52    received=52    lost=0   loss=0.0%
+23:50:43 telemetry: h11  seq=52    received=52    lost=0   loss=0.0%
+23:50:45 telemetry: h8   seq=53    received=53    lost=0   loss=0.0%
+23:50:45 telemetry: h7   seq=53    received=53    lost=0   loss=0.0%
+23:50:45 telemetry: h2   seq=53    received=53    lost=0   loss=0.0%
+23:50:45 telemetry: h4   seq=53    received=53    lost=0   loss=0.0%
+23:50:45 telemetry: h5   seq=53    received=53    lost=0   loss=0.0%
+23:50:45 telemetry: h3   seq=53    received=53    lost=0   loss=0.0%
+23:50:45 telemetry: h12  seq=53    received=53    lost=0   loss=0.0%
+23:50:45 telemetry: h1   seq=53    received=53    lost=0   loss=0.0%
+23:50:45 telemetry: h10  seq=53    received=53    lost=0   loss=0.0%
+23:50:45 telemetry: h9   seq=53    received=53    lost=0   loss=0.0%
+23:50:45 telemetry: h6   seq=53    received=53    lost=0   loss=0.0%
+23:50:45 telemetry: h11  seq=53    received=53    lost=0   loss=0.0%
+23:50:47 telemetry: h8   seq=54    received=54    lost=0   loss=0.0%
+23:50:47 telemetry: h7   seq=54    received=54    lost=0   loss=0.0%
+23:50:47 telemetry: h2   seq=54    received=54    lost=0   loss=0.0%
+23:50:47 telemetry: h5   seq=54    received=54    lost=0   loss=0.0%
+23:50:47 telemetry: h4   seq=54    received=54    lost=0   loss=0.0%
+23:50:47 telemetry: h12  seq=54    received=54    lost=0   loss=0.0%
+23:50:47 telemetry: h3   seq=54    received=54    lost=0   loss=0.0%
+23:50:47 telemetry: h1   seq=54    received=54    lost=0   loss=0.0%
+23:50:47 telemetry: h10  seq=54    received=54    lost=0   loss=0.0%
+23:50:47 telemetry: h9   seq=54    received=54    lost=0   loss=0.0%
+23:50:47 telemetry: h6   seq=54    received=54    lost=0   loss=0.0%
+23:50:47 telemetry: h11  seq=54    received=54    lost=0   loss=0.0%
+23:50:48 MITIGATION h1: rules on s4-eth1 expired (hard_timeout 30 s), its traffic is forwarded normally again
+23:50:49 telemetry: h8   seq=55    received=55    lost=0   loss=0.0%
+23:50:49 telemetry: h7   seq=55    received=55    lost=0   loss=0.0%
+23:50:49 telemetry: h2   seq=55    received=55    lost=0   loss=0.0%
+23:50:49 telemetry: h5   seq=55    received=55    lost=0   loss=0.0%
+23:50:49 telemetry: h4   seq=55    received=55    lost=0   loss=0.0%
+23:50:49 telemetry: h12  seq=55    received=55    lost=0   loss=0.0%
+23:50:49 telemetry: h3   seq=55    received=55    lost=0   loss=0.0%
+23:50:49 telemetry: h1   seq=55    received=55    lost=0   loss=0.0%
+23:50:49 telemetry: h10  seq=55    received=55    lost=0   loss=0.0%
+23:50:49 telemetry: h9   seq=55    received=55    lost=0   loss=0.0%
+23:50:49 telemetry: h6   seq=55    received=55    lost=0   loss=0.0%
+23:50:49 telemetry: h11  seq=55    received=55    lost=0   loss=0.0%
+23:50:51 telemetry: h8   seq=56    received=56    lost=0   loss=0.0%
+23:50:51 telemetry: h7   seq=56    received=56    lost=0   loss=0.0%
+23:50:51 telemetry: h2   seq=56    received=56    lost=0   loss=0.0%
+23:50:51 telemetry: h5   seq=56    received=56    lost=0   loss=0.0%
+23:50:51 telemetry: h4   seq=56    received=56    lost=0   loss=0.0%
+23:50:51 telemetry: h12  seq=56    received=56    lost=0   loss=0.0%
+23:50:51 telemetry: h3   seq=56    received=56    lost=0   loss=0.0%
+23:50:51 telemetry: h1   seq=56    received=56    lost=0   loss=0.0%
+23:50:51 telemetry: h10  seq=56    received=56    lost=0   loss=0.0%
+23:50:51 telemetry: h9   seq=56    received=56    lost=0   loss=0.0%
+23:50:51 telemetry: h6   seq=56    received=56    lost=0   loss=0.0%
+23:50:51 telemetry: h11  seq=56    received=56    lost=0   loss=0.0%
+23:50:53 telemetry: h8   seq=57    received=57    lost=0   loss=0.0%
+23:50:53 telemetry: h7   seq=57    received=57    lost=0   loss=0.0%
+23:50:53 telemetry: h2   seq=57    received=57    lost=0   loss=0.0%
+23:50:53 telemetry: h4   seq=57    received=57    lost=0   loss=0.0%
+23:50:53 telemetry: h5   seq=57    received=57    lost=0   loss=0.0%
+23:50:53 telemetry: h12  seq=57    received=57    lost=0   loss=0.0%
+23:50:53 telemetry: h3   seq=57    received=57    lost=0   loss=0.0%
+23:50:53 telemetry: h1   seq=57    received=57    lost=0   loss=0.0%
+23:50:53 telemetry: h10  seq=57    received=57    lost=0   loss=0.0%
+23:50:53 telemetry: h9   seq=57    received=57    lost=0   loss=0.0%
+23:50:53 telemetry: h6   seq=57    received=57    lost=0   loss=0.0%
+23:50:53 telemetry: h11  seq=57    received=57    lost=0   loss=0.0%
+23:50:55 telemetry: h8   seq=58    received=58    lost=0   loss=0.0%
+23:50:55 telemetry: h7   seq=58    received=58    lost=0   loss=0.0%
+23:50:55 telemetry: h2   seq=58    received=58    lost=0   loss=0.0%
+23:50:55 telemetry: h5   seq=58    received=58    lost=0   loss=0.0%
+23:50:55 telemetry: h4   seq=58    received=58    lost=0   loss=0.0%
+23:50:55 telemetry: h12  seq=58    received=58    lost=0   loss=0.0%
+23:50:55 telemetry: h3   seq=58    received=58    lost=0   loss=0.0%
+23:50:55 telemetry: h1   seq=58    received=58    lost=0   loss=0.0%
+23:50:55 telemetry: h10  seq=58    received=58    lost=0   loss=0.0%
+23:50:55 telemetry: h9   seq=58    received=58    lost=0   loss=0.0%
+23:50:55 telemetry: h6   seq=58    received=58    lost=0   loss=0.0%
+23:50:55 telemetry: h11  seq=58    received=58    lost=0   loss=0.0%
+23:50:57 telemetry: h8   seq=59    received=59    lost=0   loss=0.0%
+23:50:57 telemetry: h7   seq=59    received=59    lost=0   loss=0.0%
+23:50:57 telemetry: h2   seq=59    received=59    lost=0   loss=0.0%
+23:50:57 telemetry: h4   seq=59    received=59    lost=0   loss=0.0%
+23:50:57 telemetry: h5   seq=59    received=59    lost=0   loss=0.0%
+23:50:57 telemetry: h12  seq=59    received=59    lost=0   loss=0.0%
+23:50:57 telemetry: h3   seq=59    received=59    lost=0   loss=0.0%
+23:50:57 telemetry: h1   seq=59    received=59    lost=0   loss=0.0%
+23:50:57 telemetry: h10  seq=59    received=59    lost=0   loss=0.0%
+23:50:57 telemetry: h9   seq=59    received=59    lost=0   loss=0.0%
+23:50:57 telemetry: h6   seq=59    received=59    lost=0   loss=0.0%
+23:50:57 telemetry: h11  seq=59    received=59    lost=0   loss=0.0%
+23:50:59 telemetry: h8   seq=60    received=60    lost=0   loss=0.0%
+23:50:59 telemetry: h7   seq=60    received=60    lost=0   loss=0.0%
+23:50:59 telemetry: h2   seq=60    received=60    lost=0   loss=0.0%
+23:50:59 telemetry: h5   seq=60    received=60    lost=0   loss=0.0%
+23:50:59 telemetry: h4   seq=60    received=60    lost=0   loss=0.0%
+23:50:59 telemetry: h12  seq=60    received=60    lost=0   loss=0.0%
+23:50:59 telemetry: h3   seq=60    received=60    lost=0   loss=0.0%
+23:50:59 telemetry: h1   seq=60    received=60    lost=0   loss=0.0%
+23:50:59 telemetry: h10  seq=60    received=60    lost=0   loss=0.0%
+23:50:59 telemetry: h9   seq=60    received=60    lost=0   loss=0.0%
+23:50:59 telemetry: h6   seq=60    received=60    lost=0   loss=0.0%
+23:50:59 telemetry: h11  seq=60    received=60    lost=0   loss=0.0%
+23:51:01 telemetry: h8   seq=61    received=61    lost=0   loss=0.0%
+23:51:01 telemetry: h7   seq=61    received=61    lost=0   loss=0.0%
+23:51:01 telemetry: h2   seq=61    received=61    lost=0   loss=0.0%
+23:51:01 telemetry: h5   seq=61    received=61    lost=0   loss=0.0%
+23:51:01 telemetry: h4   seq=61    received=61    lost=0   loss=0.0%
+23:51:01 telemetry: h12  seq=61    received=61    lost=0   loss=0.0%
+23:51:01 telemetry: h3   seq=61    received=61    lost=0   loss=0.0%
+23:51:01 telemetry: h1   seq=61    received=61    lost=0   loss=0.0%
+23:51:01 telemetry: h10  seq=61    received=61    lost=0   loss=0.0%
+23:51:01 telemetry: h9   seq=61    received=61    lost=0   loss=0.0%
+23:51:01 telemetry: h6   seq=61    received=61    lost=0   loss=0.0%
+23:51:01 telemetry: h11  seq=61    received=61    lost=0   loss=0.0%
+23:51:03 telemetry: h8   seq=62    received=62    lost=0   loss=0.0%
+23:51:03 telemetry: h7   seq=62    received=62    lost=0   loss=0.0%
+23:51:03 telemetry: h2   seq=62    received=62    lost=0   loss=0.0%
+23:51:03 telemetry: h5   seq=62    received=62    lost=0   loss=0.0%
+23:51:03 telemetry: h4   seq=62    received=62    lost=0   loss=0.0%
+23:51:03 telemetry: h12  seq=62    received=62    lost=0   loss=0.0%
+23:51:03 telemetry: h3   seq=62    received=62    lost=0   loss=0.0%
+23:51:03 telemetry: h1   seq=62    received=62    lost=0   loss=0.0%
+23:51:03 telemetry: h10  seq=62    received=62    lost=0   loss=0.0%
+23:51:03 telemetry: h9   seq=62    received=62    lost=0   loss=0.0%
+23:51:03 telemetry: h6   seq=62    received=62    lost=0   loss=0.0%
+23:51:03 telemetry: h11  seq=62    received=62    lost=0   loss=0.0%
+23:51:05 telemetry: h8   seq=63    received=63    lost=0   loss=0.0%
+23:51:05 telemetry: h7   seq=63    received=63    lost=0   loss=0.0%
+23:51:05 telemetry: h2   seq=63    received=63    lost=0   loss=0.0%
+23:51:05 telemetry: h5   seq=63    received=63    lost=0   loss=0.0%
+23:51:05 telemetry: h4   seq=63    received=63    lost=0   loss=0.0%
+23:51:05 telemetry: h12  seq=63    received=63    lost=0   loss=0.0%
+23:51:05 telemetry: h3   seq=63    received=63    lost=0   loss=0.0%
+23:51:05 telemetry: h1   seq=63    received=63    lost=0   loss=0.0%
+23:51:05 telemetry: h10  seq=63    received=63    lost=0   loss=0.0%
+23:51:05 telemetry: h9   seq=63    received=63    lost=0   loss=0.0%
+23:51:05 telemetry: h6   seq=63    received=63    lost=0   loss=0.0%
+23:51:05 telemetry: h11  seq=63    received=63    lost=0   loss=0.0%
+23:51:07 telemetry: h7   seq=64    received=64    lost=0   loss=0.0%
+23:51:07 telemetry: h8   seq=64    received=64    lost=0   loss=0.0%
+23:51:07 telemetry: h2   seq=64    received=64    lost=0   loss=0.0%
+23:51:07 telemetry: h4   seq=64    received=64    lost=0   loss=0.0%
+23:51:07 telemetry: h5   seq=64    received=64    lost=0   loss=0.0%
+23:51:07 telemetry: h12  seq=64    received=64    lost=0   loss=0.0%
+23:51:07 telemetry: h3   seq=64    received=64    lost=0   loss=0.0%
+23:51:07 telemetry: h1   seq=64    received=64    lost=0   loss=0.0%
+23:51:07 telemetry: h10  seq=64    received=64    lost=0   loss=0.0%
+23:51:07 telemetry: h9   seq=64    received=64    lost=0   loss=0.0%
+23:51:07 telemetry: h6   seq=64    received=64    lost=0   loss=0.0%
+23:51:07 telemetry: h11  seq=64    received=64    lost=0   loss=0.0%
+23:51:09 telemetry: h8   seq=65    received=65    lost=0   loss=0.0%
+23:51:09 telemetry: h7   seq=65    received=65    lost=0   loss=0.0%
+23:51:09 telemetry: h2   seq=65    received=65    lost=0   loss=0.0%
+23:51:09 telemetry: h5   seq=65    received=65    lost=0   loss=0.0%
+23:51:09 telemetry: h4   seq=65    received=65    lost=0   loss=0.0%
+23:51:09 telemetry: h3   seq=65    received=65    lost=0   loss=0.0%
+23:51:09 telemetry: h12  seq=65    received=65    lost=0   loss=0.0%
+23:51:09 telemetry: h1   seq=65    received=65    lost=0   loss=0.0%
+23:51:09 telemetry: h10  seq=65    received=65    lost=0   loss=0.0%
+23:51:09 telemetry: h9   seq=65    received=65    lost=0   loss=0.0%
+23:51:09 telemetry: h6   seq=65    received=65    lost=0   loss=0.0%
+23:51:09 telemetry: h11  seq=65    received=65    lost=0   loss=0.0%
+23:51:11 telemetry: h7   seq=66    received=66    lost=0   loss=0.0%
+23:51:11 telemetry: h8   seq=66    received=66    lost=0   loss=0.0%
+23:51:11 telemetry: h2   seq=66    received=66    lost=0   loss=0.0%
+23:51:11 telemetry: h5   seq=66    received=66    lost=0   loss=0.0%
+23:51:11 telemetry: h4   seq=66    received=66    lost=0   loss=0.0%
+23:51:11 telemetry: h12  seq=66    received=66    lost=0   loss=0.0%
+23:51:11 telemetry: h3   seq=66    received=66    lost=0   loss=0.0%
+23:51:11 telemetry: h1   seq=66    received=66    lost=0   loss=0.0%
+23:51:11 telemetry: h10  seq=66    received=66    lost=0   loss=0.0%
+23:51:11 telemetry: h9   seq=66    received=66    lost=0   loss=0.0%
+23:51:11 telemetry: h6   seq=66    received=66    lost=0   loss=0.0%
+23:51:11 telemetry: h11  seq=66    received=66    lost=0   loss=0.0%
+23:51:13 telemetry: h8   seq=67    received=67    lost=0   loss=0.0%
+23:51:13 telemetry: h7   seq=67    received=67    lost=0   loss=0.0%
+23:51:13 telemetry: h2   seq=67    received=67    lost=0   loss=0.0%
+23:51:13 telemetry: h5   seq=67    received=67    lost=0   loss=0.0%
+23:51:13 telemetry: h4   seq=67    received=67    lost=0   loss=0.0%
+23:51:13 telemetry: h12  seq=67    received=67    lost=0   loss=0.0%
+23:51:13 telemetry: h3   seq=67    received=67    lost=0   loss=0.0%
+23:51:13 telemetry: h1   seq=67    received=67    lost=0   loss=0.0%
+23:51:13 telemetry: h10  seq=67    received=67    lost=0   loss=0.0%
+23:51:13 telemetry: h9   seq=67    received=67    lost=0   loss=0.0%
+23:51:13 telemetry: h6   seq=67    received=67    lost=0   loss=0.0%
+23:51:13 telemetry: h11  seq=67    received=67    lost=0   loss=0.0%
+23:51:15 telemetry: h8   seq=68    received=68    lost=0   loss=0.0%
+23:51:15 telemetry: h7   seq=68    received=68    lost=0   loss=0.0%
+23:51:15 telemetry: h2   seq=68    received=68    lost=0   loss=0.0%
+23:51:15 telemetry: h4   seq=68    received=68    lost=0   loss=0.0%
+23:51:15 telemetry: h5   seq=68    received=68    lost=0   loss=0.0%
+23:51:15 telemetry: h3   seq=68    received=68    lost=0   loss=0.0%
+23:51:15 telemetry: h12  seq=68    received=68    lost=0   loss=0.0%
+23:51:15 telemetry: h1   seq=68    received=68    lost=0   loss=0.0%
+23:51:15 telemetry: h10  seq=68    received=68    lost=0   loss=0.0%
+23:51:15 telemetry: h9   seq=68    received=68    lost=0   loss=0.0%
+23:51:15 telemetry: h6   seq=68    received=68    lost=0   loss=0.0%
+23:51:15 telemetry: h11  seq=68    received=68    lost=0   loss=0.0%
+23:51:17 telemetry: h8   seq=69    received=69    lost=0   loss=0.0%
+23:51:17 telemetry: h7   seq=69    received=69    lost=0   loss=0.0%
+23:51:17 telemetry: h2   seq=69    received=69    lost=0   loss=0.0%
+23:51:17 telemetry: h5   seq=69    received=69    lost=0   loss=0.0%
+23:51:17 telemetry: h4   seq=69    received=69    lost=0   loss=0.0%
+23:51:17 telemetry: h12  seq=69    received=69    lost=0   loss=0.0%
+23:51:17 telemetry: h3   seq=69    received=69    lost=0   loss=0.0%
+23:51:17 telemetry: h1   seq=69    received=69    lost=0   loss=0.0%
+23:51:17 telemetry: h10  seq=69    received=69    lost=0   loss=0.0%
+23:51:17 telemetry: h9   seq=69    received=69    lost=0   loss=0.0%
+23:51:17 telemetry: h6   seq=69    received=69    lost=0   loss=0.0%
+23:51:17 telemetry: h11  seq=69    received=69    lost=0   loss=0.0%
+23:51:19 switch: s7 disconnected (dpid 7)
+23:51:19 switch: s4 disconnected (dpid 4)
+23:51:19 switch: s1 disconnected (dpid 1)
+23:51:19 switch: s6 disconnected (dpid 6)
+23:51:20 switch: s3 disconnected (dpid 3)
+23:51:20 switch: s2 disconnected (dpid 2)
+23:51:20 switch: s5 disconnected (dpid 5)
+23:51:23 ALERT CRITICAL unreachable h8: no telemetry for 6.1 s (3 intervals missed), last seq 69
+23:51:23 ALERT CRITICAL unreachable h7: no telemetry for 6.1 s (3 intervals missed), last seq 69
+23:51:23 ALERT CRITICAL unreachable h2: no telemetry for 6.1 s (3 intervals missed), last seq 69
+23:51:23 ALERT CRITICAL unreachable h5: no telemetry for 6.1 s (3 intervals missed), last seq 69
+23:51:23 ALERT CRITICAL unreachable h4: no telemetry for 6.1 s (3 intervals missed), last seq 69
+23:51:23 ALERT CRITICAL unreachable h12: no telemetry for 6.1 s (3 intervals missed), last seq 69
+23:51:23 ALERT CRITICAL unreachable h3: no telemetry for 6.1 s (3 intervals missed), last seq 69
+23:51:23 ALERT CRITICAL unreachable h1: no telemetry for 6.1 s (3 intervals missed), last seq 69
+23:51:23 ALERT CRITICAL unreachable h10: no telemetry for 6.1 s (3 intervals missed), last seq 69
+23:51:23 ALERT CRITICAL unreachable h9: no telemetry for 6.1 s (3 intervals missed), last seq 69
+23:51:23 ALERT CRITICAL unreachable h6: no telemetry for 6.1 s (3 intervals missed), last seq 69
+23:51:23 ALERT CRITICAL unreachable h11: no telemetry for 6.1 s (3 intervals missed), last seq 69
+00:00:19 telemetry: skipped malformed packet from 192.168.0.4:50021: 'utf-8' codec can't decode byte 0xd0 in position 0: invalid continuation byte
+00:00:19 telemetry: skipped malformed packet from 192.168.0.4:50021: 'utf-8' codec can't decode byte 0xd0 in position 0: invalid continuation byte
+00:00:19 telemetry: skipped malformed packet from 192.168.0.4:50021: 'utf-8' codec can't decode byte 0xd0 in position 0: invalid continuation byte
+00:17:08 telemetry: skipped malformed packet from 192.168.0.5:50024: 'utf-8' codec can't decode byte 0xd0 in position 0: invalid continuation byte
+00:17:08 telemetry: skipped malformed packet from 192.168.0.5:50024: 'utf-8' codec can't decode byte 0xd0 in position 0: invalid continuation byte
+00:17:08 telemetry: skipped malformed packet from 192.168.0.5:50024: 'utf-8' codec can't decode byte 0xd0 in position 0: invalid continuation byte

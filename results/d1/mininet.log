@@ -1,0 +1,204 @@
+Script started on 2026-10-29 19:53:34+05:30 [COMMAND="sudo python3 topology/topology.py" TERM="xterm-256color" TTY="/dev/pts/6" COLUMNS="158" LINES="24"]
+[sudo: authenticate] Password: *********         
+*** Creating network
+*** Adding hosts:
+h1 h2 h3 h4 h5 h6 h7 h8 h9 h10 h11 h12 
+*** Adding switches:
+s1 s2 s3 s4 s5 s6 s7 
+*** Adding links:
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(h1, s4) (100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(h2, s4) (100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(h3, s4) (100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(h4, s5) (100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(h5, s5) (100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(h6, s5) (100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(h7, s6) (100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(h8, s6) (100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(h9, s6) (100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(h10, s7) (100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(h11, s7) (100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(h12, s7) (50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(s2, s1) (10.00Mbit) (10.00Mbit) (s3, s1) (50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(s4, s2) (50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(s5, s2) (50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(s6, s3) (50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(s7, s3) 
+*** Configuring hosts
+h1 h2 h3 h4 h5 h6 h7 h8 h9 h10 h11 h12 
+Unable to contact the remote controller at 127.0.0.1:6653
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+*** Wrote 25 switch ports to /home/arnav-joshi/projects/CN-MiniProject/logs/topology.json
+*** Starting controller
+c0 
+*** Starting 7 switches
+s1 s2 s3 s4 s5 s6 s7 ...(50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(10.00Mbit) (100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(10.00Mbit) (50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(100.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+(50.00Mbit) *** Error: Warning: sch_htb: quantum of class 50001 is big. Consider r2q change.
+
+*** Starting agent on h1
+*** Starting agent on h2
+*** Starting agent on h3
+*** Starting agent on h4
+*** Starting agent on h5
+*** Starting agent on h6
+*** Starting agent on h7
+*** Starting agent on h8
+*** Starting agent on h9
+*** Starting agent on h10
+*** Starting agent on h11
+*** Starting agent on h12
+*** Starting CLI:
+mininet> sh echo "=== T1 pingall $(date +%T) ==="
+=== T1 pingall 19:55:23 ===
+mininet> pingall
+*** Ping: testing ping reachability
+h1 -> h2 h3 h4 h5 h6 h7 h8 h9 h10 h11 h12 
+h2 -> h1 h3 h4 h5 h6 h7 h8 h9 h10 h11 h12 
+h3 -> h1 h2 h4 h5 h6 h7 h8 h9 h10 h11 h12 
+h4 -> h1 h2 h3 h5 h6 h7 h8 h9 h10 h11 h12 
+h5 -> h1 h2 h3 h4 h6 h7 h8 h9 h10 h11 h12 
+h6 -> h1 h2 h3 h4 h5 h7 h8 h9 h10 h11 h12 
+h7 -> h1 h2 h3 h4 h5 h6 h8 h9 h10 h11 h12 
+h8 -> h1 h2 h3 h4 h5 h6 h7 h9 h10 h11 h12 
+h9 -> h1 h2 h3 h4 h5 h6 h7 h8 h10 h11 h12 
+h10 -> h1 h2 h3 h4 h5 h6 h7 h8 h9 h11 h12 
+h11 -> h1 h2 h3 h4 h5 h6 h7 h8 h9 h10 h12 
+h12 -> h1 h2 h3 h4 h5 h6 h7 h8 h9 h10 h11 
+*** Results: 0% dropped (132/132 received)
+mininet> sh echo "=== T2 nodes $(date +%T) ==="
+=== T2 nodes 19:55:41 ===
+mininet> [Kmininet> sh echo "=== T3 congestion $(date +%T) ==="
+=== T3 congestion 19:57:05 ===
+mininet> h10 iperf -s &
+------------------------------------------------------------
+Server listening on TCP port 5001
+TCP window size: 85.3 KByte (default)
+------------------------------------------------------------
+mininet> h1 iperf -c 10.0.0.10 -t 20
+------------------------------------------------------------
+Client connecting to 10.0.0.10, TCP port 5001
+TCP window size: 85.3 KByte (default)
+------------------------------------------------------------
+[  1] local 10.0.0.1 port 57688 connected with 10.0.0.10 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.0000-21.9953 sec  25.1 MBytes  9.58 Mbits/sec
+mininet> h10 kill %iperf
+[  1] local 10.0.0.10 port 5001 connected with 10.0.0.1 port 57688
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.0000-21.9828 sec  25.1 MBytes  9.59 Mbits/sec
+mininet> sh echo "=== T4 agent failure $(date +%T) ==="
+=== T4 agent failure 19:58:28 ===
+mininet> h5 kill %python3
+mininet> h5 python3 agent/agent.py --node-id=h5 --monitor-ip 10.0.0.100 --port 9999 --interval 2 > logs/agent-h5.log 2>&1 &
+mininet> sh echo "=== T5 flood $(date +%T) ===
+/bin/sh: 1: Syntax error: Unterminated quoted string
+mininet> sh echo "=== T5 flood $(date +%T) ==="
+=== T5 flood 20:00:10 ===
+mininet> h11 iperf -s &
+mininet> h2 iperf -c 10.0.0.11 -t 10
+------------------------------------------------------------
+Client connecting to 10.0.0.11, TCP port 5001
+TCP window size: 85.3 KByte (default)
+------------------------------------------------------------
+[  1] local 10.0.0.2 port 35698 connected with 10.0.0.11 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.0000-12.0153 sec  13.8 MBytes  9.60 Mbits/sec
+mininet> h1 hping3 --flood --udp -p 5001 -d 1200 10.0.0.11 &
+mininet> h1 tc -s qdisc show dev h1-eth0
+HPING 10.0.0.11 (h1-eth0 10.0.0.11): udp mode set, 28 headers + 1200 data bytes
+hping in flood mode, no replies will be shown
+qdisc htb 5: root refcnt 17 r2q 10 default 0x1 direct_packets_stat 0 direct_qlen 1000
+ Sent 56434480 bytes 41725 pkt (dropped 0, overlimits 23135 requeues 0) 
+ backlog 0b 0p requeues 0
+mininet> h1 ip -s link show h1-eth0
+2: [1;36mh1-eth0@if8: [0m<BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc htb state [1;32mUP [0mmode DEFAULT group default qlen 1000
+    link/ether [1;33m00:00:00:00:00:01[0m brd [1;33mff:ff:ff:ff:ff:ff[0m link-netnsid 0
+    RX:  bytes packets errors dropped  missed   mcast           
+         73353     733      0       0       0       0 
+    TX:  bytes packets errors dropped carrier collsns           
+      71606793   37109      0       0       0       0 
+mininet> sh ovs-ofctl -O OpenFlow13 dump-flows s4 | grep -E 'priority=(100|200)'
+mininet> h2 iperf -c 10.0.0.11 -t 10
+------------------------------------------------------------
+Client connecting to 10.0.0.11, TCP port 5001
+TCP window size: 85.3 KByte (default)
+------------------------------------------------------------
+[  1] local 10.0.0.2 port 44308 connected with 10.0.0.11 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.0000-11.0263 sec  1.17 MBytes   892 Kbits/sec
+mininet> h1 pkill hping3
+mininet> h1 ping -c3 10.0.0.11
+
+--- 10.0.0.11 hping statistic ---
+80986 packets transmitted, 0 packets received, 100% packet loss
+round-trip min/avg/max = 0.0/0.0/0.0 ms
+PING 10.0.0.11 (10.0.0.11) 56(84) bytes of data.
+64 bytes from 10.0.0.11: icmp_seq=1 ttl=64 time=0.562 ms
+64 bytes from 10.0.0.11: icmp_seq=2 ttl=64 time=0.084 ms
+64 bytes from 10.0.0.11: icmp_seq=3 ttl=64 time=0.085 ms
+
+--- 10.0.0.11 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2071ms
+rtt min/avg/max/mdev = 0.084/0.243/0.562/0.225 ms
+mininet> h11 kill %iperf
+------------------------------------------------------------
+Server listening on TCP port 5001
+TCP window size: 85.3 KByte (default)
+------------------------------------------------------------
+[  1] local 10.0.0.11 port 5001 connected with 10.0.0.2 port 35698
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.0000-12.0081 sec  13.8 MBytes  9.61 Mbits/sec
+[  2] local 10.0.0.11 port 5001 connected with 10.0.0.2 port 44308
+[ ID] Interval       Transfer     Bandwidth
+[  2] 0.0000-10.9704 sec  1.17 MBytes   897 Kbits/sec
+mininet> exit
+*** Stopping 1 controllers
+c0 
+*** Stopping 19 links
+...................
+*** Stopping 7 switches
+s1 s2 s3 s4 s5 s6 s7 
+*** Stopping 12 hosts
+h1 h2 h3 h4 h5 h6 h7 h8 h9 h10 h11 h12 
+*** Done
+
+Script done on 2026-10-29 20:04:07+05:30 [COMMAND_EXIT_CODE="0"]
