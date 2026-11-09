@@ -5,9 +5,10 @@ Hosts send application telemetry over **UDP**; an SDN controller combines it
 with **OpenFlow port statistics** to detect abnormal conditions, raise alerts,
 and install flow rules in response.
 
-> **Status (18 Oct):** deliverable D1 is complete. The topology, agents,
+> **Status (29 Oct):** deliverable D1 is complete. The topology, agents,
 > telemetry receiver, link-utilization polling, heartbeat and utilization alerts,
-> and the correlation + mitigation rule are all verified in Mininet (see the
+> and the correlation + mitigation rule are all verified in Mininet, and the
+> final rehearsal's logs are saved in [`results/`](#d1-rehearsal-results) (see the
 > [D1 test cases](#d1-test-cases)). See [D1 progress](#d1-deliverable) and the work logs
 > ([3 Oct](README2.md), [17 Oct](README3.md), [18 Oct](README4.md)).
 
@@ -331,24 +332,49 @@ h5 python3 agent/agent.py --node-id=h5 --monitor-ip 10.0.0.100 --port 9999 --int
 > `pkill -f agent.py`: Mininet hosts share one process list, so it would stop
 > all 12 agents.
 
-**Flood (correlation + mitigation test):**
+**Flood (correlation + mitigation test):** h1 floods h3, which sits on the same
+edge switch (s4), so the whole path runs at 100 Mbit/s.
 ```
-h11 iperf -s &                                       # iperf server on h11
-h2 iperf -c 10.0.0.11 -t 10                          # baseline across the bottleneck: ≈ 9.6 Mbit/s
-h1 hping3 --flood --udp -p 5001 -d 1200 10.0.0.11 &  # h1 floods h11
+h3 iperf -s -u &                                     # UDP iperf server on h3
+h2 iperf -u -c 10.0.0.3 -b 30M -l 1200 -t 10         # baseline: 0 % loss
+h1 hping3 --flood --udp -p 5001 -d 1200 10.0.0.3 &   # h1 floods h3 at ≈ 100 Mbit/s
                                  # -> ALERT CRITICAL unexplained h1, MITIGATION h1: installed on s4-eth1
 sh ovs-ofctl -O OpenFlow13 dump-flows s4             # 3 rules with hard_timeout=30; the drop rule's n_packets keeps rising
-h2 iperf -c 10.0.0.11 -t 10                          # recovers: h1's flood is dropped at s4
+h2 iperf -u -c 10.0.0.3 -b 30M -l 1200 -t 10         # still 0 % loss: h1's flood is dropped at s4
 h1 pkill hping3                  # stop the flood -> ALERT RESOLVED after ~10 s, MITIGATION ... expired within 30 s
-h1 ping -c3 10.0.0.11                                # h1 is forwarded normally again
-h11 kill %iperf
+h1 ping -c3 10.0.0.3                                 # h1 is forwarded normally again
+h3 kill %iperf
 ```
 While the flood runs, h1's seq numbers keep increasing in the controller log
 (its telemetry passes the allow rule). Before the rules land, the flood also
-fills h1's path, so utilization alerts on `s4->s2`, `s2->s1` and `s1->s3` may
-appear; they resolve once the dropped traffic is off those links.
+fills s4's port towards h3, so a utilization alert on `s4->h3` may appear; it
+resolves once the flood is dropped.
+
+The same test runs unattended, with no typing at the `mininet>` prompt (Ryu
+must already be running; save its output to `results/d1-flood/controller.log`):
+```bash
+sudo python3 topology/flood_test.py      # ends with RESULT: PASS or RESULT: CHECK
+```
+It builds the same network, measures h1's flood rate towards h11 and h4 as a
+diagnostic, runs the steps above, and writes `mininet.log`, the agent logs and
+`topology.json` to `results/d1-flood/`. Don't run `sudo mn -c` while Ryu is up:
+it kills `ryu-manager` too.
+
+> **Why not flood a host across the bottleneck (e.g. h11)?** In this emulation a
+> host can only send as fast as the narrowest link on its path: measured on 29
+> Oct, `hping3 --flood` from h1 leaves h1-eth0 at 10.0 Mbit/s towards h11 (s3–s1
+> is 10 Mbit/s) and 50.0 Mbit/s towards h4 (s4–s2 is 50 Mbit/s). Neither reaches
+> the 60 Mbit/s trigger on h1's 100 Mbit/s port, so no mitigation happens; only
+> the bottleneck's utilization alert fires. All links share one kernel, so a
+> packet presumably stays charged to hping3's socket until the slowest queue on
+> the path sends it, which throttles the sender.
+>
 > Keep `-d 1200`: hping3's default packets are 54 bytes, and it may not send
 > enough of them to reach the 60 % trigger on a 100 Mbit/s link.
+>
+> h2's check traffic is 30 Mbit/s UDP on purpose: it stays under the 60 %
+> trigger, so h2 is never taken for unexplained traffic itself (a full-speed
+> TCP iperf from h2 would be, and would get h2 blocked too).
 
 **Cleanup** (always after exiting, and after any crash):
 ```bash
@@ -370,7 +396,7 @@ telemetry with port stats; at least one telemetry-triggered flow-rule change.
 | 4 | Port stats polling + utilization from `topology.json` | ✅ Verified in Mininet (bottleneck at 96.5 % during iperf h1 → h10) |
 | 5 | Heartbeat checker (unreachable / resolved) | ✅ Verified in Mininet (h5 agent killed → CRITICAL, restarted → RESOLVED) |
 | 6 | Static utilization alerts (70 / 90 %, de-dup + cooldown) | ✅ Verified in Mininet (iperf h1 → h10 raised CRITICAL `s1->s3` at 93.9 %, RESOLVED after the 10 s cooldown, no other link alerted) |
-| 7 | Correlation + mitigation flow rules | ✅ Verified in Mininet (hping3 flood from h1 → drop rule on s4-eth1, h2 → h11 recovered, h1 telemetry continued) |
+| 7 | Correlation + mitigation flow rules | ✅ Verified in Mininet (hping3 flood h1 → h3 → 3 rules on s4-eth1, h2 → h3 at 0 % loss while h1 was blocked, h1 telemetry continued, rules expired) |
 | 8 | README: mitigation path in diagram, test-case table | ✅ Done |
 
 ### D1 test cases
@@ -383,7 +409,22 @@ All run in Mininet with the commands in [How to run](#how-to-run).
 | 2 | All 12 nodes reporting | Start the topology, watch the controller log | `new node h1` … `h12`, seq increasing, 0 % loss | ✅ 12 agents, 312 msgs each, no send errors |
 | 3 | Utilization under congestion | `iperf` h1 → h10 (crosses the s3–s1 bottleneck) | s1 → s3 ≈ 96 %, `CRITICAL utilization s1->s3`, `RESOLVED` ~10 s after iperf ends, no other link alerts | ✅ 96.5 % mid-transfer, CRITICAL raised at 93.9 %, RESOLVED after cooldown, no other alerts |
 | 4 | Agent failure | `h5 kill %python3`, then restart the agent | `CRITICAL unreachable h5` within ~7 s, `RESOLVED` when it is back | ✅ |
-| 5 | Unexplained traffic | `hping3 --flood` from h1 to h11 | `CRITICAL unexplained h1`, 3 rules on s4-eth1, h2 → h11 recovers, h1 telemetry continues, rules expire ≤ 30 s after the flood stops | ✅ |
+| 5 | Unexplained traffic | `hping3 --flood` from h1 to h3 (same edge switch), or `sudo python3 topology/flood_test.py` | `CRITICAL unexplained h1`, 3 rules on s4-eth1, h2 → h3 UDP at 30 Mbit/s stays loss-free, h1 telemetry continues, rules expire ≤ 30 s after the flood stops | ✅ h1 flooded at 100.2 Mbit/s, alert at 67.6 %, 3 rules, h2 0 % loss during mitigation, rules expired, h1 ping OK (`RESULT: PASS`) |
+
+### D1 rehearsal results
+
+Final rehearsal, 29 Oct, on the commit merged as D1 (d8fc56d). Each folder holds
+the controller log, the `mininet>` session, the agent logs and `topology.json`.
+
+| Folder | What | Outcome |
+|---|---|---|
+| [`results/d1/`](results/d1/) | Tests 1–4 typed at the `mininet>` prompt; `env.txt` has the kernel, OVS, Ryu, iperf and hping3 versions; `events.log` has the alerts only | pingall 0 % dropped; all 12 nodes reporting; `CRITICAL utilization s1->s3` at 96.4 % and RESOLVED; `CRITICAL unreachable h5` and RESOLVED after restart |
+| [`results/d1-flood/`](results/d1-flood/) | Test 5 via `topology/flood_test.py` | `RESULT: PASS` |
+
+`results/d1/` also contains the original h1 → h11 flood (end of `mininet.log`).
+It raised only the bottleneck's utilization alert and no mitigation, which is
+how the [bottleneck limit](#how-to-run) above was found; test 5 was then moved to
+h1 → h3.
 
 ## 12-day plan
 
@@ -440,10 +481,12 @@ CN-MiniProject/
 ├── controller/
 │   └── monitor_app.py    # Ryu app: forwarding + telemetry + port stats + alerts + mitigation
 ├── topology/
-│   └── topology.py       # Mininet tree, monitor node, topology.json, agents
+│   ├── topology.py       # Mininet tree, monitor node, topology.json, agents
+│   └── flood_test.py     # automated test 5 (flood -> mitigation), writes results/d1-flood/
 ├── dashboard/            # Streamlit app (after D1)
 ├── server/               # unused for now
 ├── logs/                 # gitignored: topology.json, agent-hN.log
+├── results/              # saved test runs (D1 rehearsal)
 ├── ryu-env/              # gitignored
 ├── README.md             # this file
 ├── README2.md            # work log, 3 Oct

@@ -1,0 +1,30 @@
+telemetry: listening on udp 0.0.0.0:9999
+topology: loaded 7 switches, 12 hosts, 25 ports from /home/arnav-joshi/projects/CN-MiniProject/logs/topology.json
+switch: s7 connected (dpid 7)
+switch: s3 connected (dpid 3)
+switch: s6 connected (dpid 6)
+switch: s5 connected (dpid 5)
+switch: s2 connected (dpid 2)
+switch: s1 connected (dpid 1)
+switch: s4 connected (dpid 4)
+telemetry: new node h8
+telemetry: new node h10
+telemetry: new node h5
+telemetry: new node h6
+telemetry: new node h1
+telemetry: new node h2
+telemetry: new node h3
+telemetry: new node h4
+telemetry: new node h9
+telemetry: new node h11
+telemetry: new node h12
+telemetry: new node h7
+ALERT CRITICAL utilization s1->s3: s1-eth2 tx 96.4% of 10 Mbit/s (9.64 Mbit/s)
+ALERT RESOLVED utilization s1->s3: s1-eth2 tx 0.0% of 10 Mbit/s (0.00 Mbit/s), under 70% for 10 s (alert lasted 28 s)
+ALERT CRITICAL unreachable h5: no telemetry for 6.0 s (3 intervals missed), last seq 147
+telemetry: h5 restarted (seq 147 -> 1)
+ALERT RESOLVED unreachable h5: telemetry is back (seq 1) (alert lasted 45 s)
+ALERT CRITICAL utilization s1->s3: s1-eth2 tx 93.8% of 10 Mbit/s (9.38 Mbit/s)
+ALERT WARNING  utilization s1->s3: s1-eth2 tx 73.6% of 10 Mbit/s (7.36 Mbit/s)
+ALERT CRITICAL utilization s1->s3: s1-eth2 tx 100.0% of 10 Mbit/s (10.00 Mbit/s)
+ALERT RESOLVED utilization s1->s3: s1-eth2 tx 0.0% of 10 Mbit/s (0.00 Mbit/s), under 70% for 10 s (alert lasted 108 s)

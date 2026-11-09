@@ -1,0 +1,280 @@
+{
+  "switches": {
+    "s1": 1,
+    "s2": 2,
+    "s3": 3,
+    "s4": 4,
+    "s5": 5,
+    "s6": 6,
+    "s7": 7
+  },
+  "hosts": {
+    "h1": {
+      "ip": "10.0.0.1",
+      "mac": "00:00:00:00:00:01",
+      "switch": "s4",
+      "dpid": 4,
+      "port": 1
+    },
+    "h2": {
+      "ip": "10.0.0.2",
+      "mac": "00:00:00:00:00:02",
+      "switch": "s4",
+      "dpid": 4,
+      "port": 2
+    },
+    "h3": {
+      "ip": "10.0.0.3",
+      "mac": "00:00:00:00:00:03",
+      "switch": "s4",
+      "dpid": 4,
+      "port": 3
+    },
+    "h4": {
+      "ip": "10.0.0.4",
+      "mac": "00:00:00:00:00:04",
+      "switch": "s5",
+      "dpid": 5,
+      "port": 1
+    },
+    "h5": {
+      "ip": "10.0.0.5",
+      "mac": "00:00:00:00:00:05",
+      "switch": "s5",
+      "dpid": 5,
+      "port": 2
+    },
+    "h6": {
+      "ip": "10.0.0.6",
+      "mac": "00:00:00:00:00:06",
+      "switch": "s5",
+      "dpid": 5,
+      "port": 3
+    },
+    "h7": {
+      "ip": "10.0.0.7",
+      "mac": "00:00:00:00:00:07",
+      "switch": "s6",
+      "dpid": 6,
+      "port": 1
+    },
+    "h8": {
+      "ip": "10.0.0.8",
+      "mac": "00:00:00:00:00:08",
+      "switch": "s6",
+      "dpid": 6,
+      "port": 2
+    },
+    "h9": {
+      "ip": "10.0.0.9",
+      "mac": "00:00:00:00:00:09",
+      "switch": "s6",
+      "dpid": 6,
+      "port": 3
+    },
+    "h10": {
+      "ip": "10.0.0.10",
+      "mac": "00:00:00:00:00:0a",
+      "switch": "s7",
+      "dpid": 7,
+      "port": 1
+    },
+    "h11": {
+      "ip": "10.0.0.11",
+      "mac": "00:00:00:00:00:0b",
+      "switch": "s7",
+      "dpid": 7,
+      "port": 2
+    },
+    "h12": {
+      "ip": "10.0.0.12",
+      "mac": "00:00:00:00:00:0c",
+      "switch": "s7",
+      "dpid": 7,
+      "port": 3
+    }
+  },
+  "monitor": {
+    "ip": "10.0.0.100",
+    "switch": "s1",
+    "dpid": 1,
+    "port": 3
+  },
+  "ports": [
+    {
+      "switch": "s1",
+      "dpid": 1,
+      "port": 1,
+      "peer": "s2",
+      "bw_bps": 50000000
+    },
+    {
+      "switch": "s1",
+      "dpid": 1,
+      "port": 2,
+      "peer": "s3",
+      "bw_bps": 10000000
+    },
+    {
+      "switch": "s1",
+      "dpid": 1,
+      "port": 3,
+      "peer": "monitor",
+      "bw_bps": 100000000
+    },
+    {
+      "switch": "s2",
+      "dpid": 2,
+      "port": 1,
+      "peer": "s4",
+      "bw_bps": 50000000
+    },
+    {
+      "switch": "s2",
+      "dpid": 2,
+      "port": 2,
+      "peer": "s5",
+      "bw_bps": 50000000
+    },
+    {
+      "switch": "s2",
+      "dpid": 2,
+      "port": 3,
+      "peer": "s1",
+      "bw_bps": 50000000
+    },
+    {
+      "switch": "s3",
+      "dpid": 3,
+      "port": 1,
+      "peer": "s6",
+      "bw_bps": 50000000
+    },
+    {
+      "switch": "s3",
+      "dpid": 3,
+      "port": 2,
+      "peer": "s7",
+      "bw_bps": 50000000
+    },
+    {
+      "switch": "s3",
+      "dpid": 3,
+      "port": 3,
+      "peer": "s1",
+      "bw_bps": 10000000
+    },
+    {
+      "switch": "s4",
+      "dpid": 4,
+      "port": 1,
+      "peer": "h1",
+      "bw_bps": 100000000
+    },
+    {
+      "switch": "s4",
+      "dpid": 4,
+      "port": 2,
+      "peer": "h2",
+      "bw_bps": 100000000
+    },
+    {
+      "switch": "s4",
+      "dpid": 4,
+      "port": 3,
+      "peer": "h3",
+      "bw_bps": 100000000
+    },
+    {
+      "switch": "s4",
+      "dpid": 4,
+      "port": 4,
+      "peer": "s2",
+      "bw_bps": 50000000
+    },
+    {
+      "switch": "s5",
+      "dpid": 5,
+      "port": 1,
+      "peer": "h4",
+      "bw_bps": 100000000
+    },
+    {
+      "switch": "s5",
+      "dpid": 5,
+      "port": 2,
+      "peer": "h5",
+      "bw_bps": 100000000
+    },
+    {
+      "switch": "s5",
+      "dpid": 5,
+      "port": 3,
+      "peer": "h6",
+      "bw_bps": 100000000
+    },
+    {
+      "switch": "s5",
+      "dpid": 5,
+      "port": 4,
+      "peer": "s2",
+      "bw_bps": 50000000
+    },
+    {
+      "switch": "s6",
+      "dpid": 6,
+      "port": 1,
+      "peer": "h7",
+      "bw_bps": 100000000
+    },
+    {
+      "switch": "s6",
+      "dpid": 6,
+      "port": 2,
+      "peer": "h8",
+      "bw_bps": 100000000
+    },
+    {
+      "switch": "s6",
+      "dpid": 6,
+      "port": 3,
+      "peer": "h9",
+      "bw_bps": 100000000
+    },
+    {
+      "switch": "s6",
+      "dpid": 6,
+      "port": 4,
+      "peer": "s3",
+      "bw_bps": 50000000
+    },
+    {
+      "switch": "s7",
+      "dpid": 7,
+      "port": 1,
+      "peer": "h10",
+      "bw_bps": 100000000
+    },
+    {
+      "switch": "s7",
+      "dpid": 7,
+      "port": 2,
+      "peer": "h11",
+      "bw_bps": 100000000
+    },
+    {
+      "switch": "s7",
+      "dpid": 7,
+      "port": 3,
+      "peer": "h12",
+      "bw_bps": 100000000
+    },
+    {
+      "switch": "s7",
+      "dpid": 7,
+      "port": 4,
+      "peer": "s3",
+      "bw_bps": 50000000
+    }
+  ]
+}
