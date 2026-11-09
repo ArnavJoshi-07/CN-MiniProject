@@ -8,6 +8,13 @@ Every --interval seconds it sends one JSON datagram to the monitor:
      "tx_bytes": 123456, "rx_bytes": 654321, "app_tx_bytes": 7140}
 
 - seq increases by 1 per message, so the receiver can count gaps as loss.
+- cpu_pct is the CPU used by the processes running *in this Mininet host*,
+  in % of one core (like `top`): 100 = one core fully busy. psutil's
+  cpu_percent() would be useless here: a Mininet host is only a network
+  namespace, so /proc/stat shows the whole machine's CPU, the same on every
+  host. Instead the agent sums the CPU time of every process whose network
+  namespace is its own (needs root, which Mininet hosts have).
+- mem_pct is the whole machine's memory use (namespaces don't split memory).
 - tx_bytes / rx_bytes are cumulative counters of the host's interface.
 - app_tx_bytes is the cumulative bytes sent by this agent only (on-the-wire
   size), so the controller can tell "traffic the application explains" apart
@@ -19,6 +26,7 @@ Usage (normally started by topology/topology.py):
 
 import argparse
 import json
+import os
 import signal
 import socket
 import sys
@@ -34,6 +42,9 @@ except ImportError:
 # gives the size the switch actually counts, so app_tx_bytes is comparable
 # with OpenFlow port byte counters.
 HEADER_OVERHEAD = 14 + 20 + 8
+
+# Kernel clock ticks per second: /proc/<pid>/stat counts CPU time in ticks.
+CLK_TCK = os.sysconf("SC_CLK_TCK")
 
 
 def log(msg):
@@ -57,6 +68,64 @@ def interface_counters(node_id):
     return sum(c.bytes_sent for c in others), sum(c.bytes_recv for c in others)
 
 
+def own_netns():
+    """Identity of this process's network namespace, e.g. 'net:[4026532301]',
+    or None if it can't be read."""
+    try:
+        return os.readlink("/proc/self/ns/net")
+    except OSError:
+        return None
+
+
+def netns_cpu_ticks(netns):
+    """pid -> CPU time used so far (user + system, in ticks) of every process
+    in the network namespace `netns`, i.e. every process of this host."""
+    ticks = {}
+    for pid in os.listdir("/proc"):
+        if not pid.isdigit():
+            continue
+        try:
+            if os.readlink(f"/proc/{pid}/ns/net") != netns:
+                continue
+            with open(f"/proc/{pid}/stat") as f:
+                # The command name (field 2) is in brackets and may contain
+                # spaces, so split after the last ")". Then field 3 (state) is
+                # index 0, and utime (field 14) / stime (field 15) are 11 / 12.
+                fields = f.read().rsplit(")", 1)[1].split()
+            ticks[int(pid)] = int(fields[11]) + int(fields[12])
+        except (OSError, IndexError, ValueError):
+            continue        # the process exited meanwhile, or isn't readable
+    return ticks
+
+
+class HostCpu:
+    """CPU use of this Mininet host between two calls, in % of one core."""
+
+    def __init__(self):
+        self.netns = own_netns()
+        self.last_ticks = netns_cpu_ticks(self.netns) if self.netns else {}
+        self.last_time = time.monotonic()
+        if self.netns is None:
+            psutil.cpu_percent(interval=None)     # baseline for the fallback
+
+    def percent(self):
+        if self.netns is None:
+            # Can't see namespaces (not root): whole machine, % of all cores.
+            return psutil.cpu_percent(interval=None)
+        now, ticks = time.monotonic(), netns_cpu_ticks(self.netns)
+        dt = now - self.last_time
+        # Only processes present in both samples: one that started meanwhile
+        # brings CPU time used before, one that exited took its time with it.
+        used = sum(max(0, t - self.last_ticks[pid])
+                   for pid, t in ticks.items() if pid in self.last_ticks)
+        self.last_ticks, self.last_time = ticks, now
+        # Ticks are 10 ms: over a very short gap (the first message is sent
+        # right after start-up) one tick would read as a huge percentage.
+        if dt < 0.5:
+            return 0.0
+        return round(used / CLK_TCK / dt * 100, 1)
+
+
 def parse_args():
     p = argparse.ArgumentParser(description="UDP telemetry agent")
     p.add_argument("--node-id", required=True, help="e.g. h1")
@@ -77,8 +146,9 @@ def main():
     # SOCK_DGRAM = UDP: no connection, each sendto() is one independent packet.
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    # The first cpu_percent() call always returns 0.0; it just sets a baseline.
-    psutil.cpu_percent(interval=None)
+    # Takes the first CPU sample; the first message reports the CPU used
+    # between here and then.
+    cpu = HostCpu()
 
     seq = 0
     app_tx_bytes = 0
@@ -93,7 +163,7 @@ def main():
                 "node_id": args.node_id,
                 "seq": seq,
                 "timestamp": time.time(),
-                "cpu_pct": psutil.cpu_percent(interval=None),
+                "cpu_pct": cpu.percent(),
                 "mem_pct": psutil.virtual_memory().percent,
                 "tx_bytes": tx_bytes,
                 "rx_bytes": rx_bytes,

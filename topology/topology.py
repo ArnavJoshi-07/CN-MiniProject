@@ -159,6 +159,18 @@ def export_topology(net, path):
     info(f"*** Wrote {len(ports)} switch ports to {path}\n")
 
 
+def start_agent(h, append=False):
+    """Start the telemetry agent on one host, in the background.
+
+    append=True adds to the host's agent log instead of starting a new one
+    (used when the demo restarts an agent it killed)."""
+    # The trailing & is essential: without it, h.cmd() blocks forever.
+    h.cmd(f"python3 {AGENT_PATH} --node-id {h.name} "
+          f"--monitor-ip {MONITOR_ADDR} --port {TELEMETRY_PORT} "
+          f"--interval {AGENT_INTERVAL} "
+          f"{'>>' if append else '>'} {LOG_DIR}/agent-{h.name}.log 2>&1 &")
+
+
 def start_agents(net):
     """Start one telemetry agent per host, in the background."""
     if not os.path.exists(AGENT_PATH):
@@ -167,11 +179,7 @@ def start_agents(net):
     os.makedirs(LOG_DIR, exist_ok=True)
     for h in net.hosts:
         info(f"*** Starting agent on {h.name}\n")
-        # The trailing & is essential: without it, h.cmd() blocks forever.
-        h.cmd(f"python3 {AGENT_PATH} --node-id {h.name} "
-              f"--monitor-ip {MONITOR_ADDR} --port {TELEMETRY_PORT} "
-              f"--interval {AGENT_INTERVAL} "
-              f"> {LOG_DIR}/agent-{h.name}.log 2>&1 &")
+        start_agent(h)
 
 
 def stop_agents(net):
