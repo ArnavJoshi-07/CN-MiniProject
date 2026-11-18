@@ -5,12 +5,14 @@ Hosts send application telemetry over **UDP**; an SDN controller combines it
 with **OpenFlow port statistics** to detect abnormal conditions, raise alerts,
 and install flow rules in response.
 
-> **Status (29 Oct):** deliverable D1 is complete. The topology, agents,
-> telemetry receiver, link-utilization polling, heartbeat and utilization alerts,
-> and the correlation + mitigation rule are all verified in Mininet, and the
-> final rehearsal's logs are saved in [`results/`](#d1-rehearsal-results) (see the
-> [D1 test cases](#d1-test-cases)). See [D1 progress](#d1-deliverable) and the work logs
-> ([3 Oct](README2.md), [17 Oct](README3.md), [18 Oct](README4.md)).
+> **Status (9 Nov):** final version for submission. On top of D1 (topology,
+> agents, port-stats utilization, heartbeat and utilization alerts, correlation +
+> mitigation; see [D1](#d1-deliverable)), the controller now also raises CPU,
+> telemetry-loss and link-down alerts, explains why a node went silent, and writes
+> everything to SQLite, which a live Streamlit dashboard reads. **`./demo.sh`
+> runs the whole system and a guided, self-checking demo of every scenario**
+> ([Demo](#demo)). Work logs: [3 Oct](README2.md), [17 Oct](README3.md),
+> [18 Oct](README4.md).
 
 ---
 
@@ -46,10 +48,16 @@ and install flow rules in response.
         │  • utilization alerts: WARNING 70 % / CRITICAL 90 %      │
         │  • correlation: host port busy but its agent sent        │
         │    little -> "unexplained" alert + mitigation rules      │
+        │  • host alerts: CPU, telemetry loss (30 s window)        │
+        │  • PortStatus -> link down alerts; "unreachable" says    │
+        │    why: link down on the path vs. agent failure          │
         └─────────────────────────────┬────────────────────────────┘
-                                      │ after D1
+                                      │ every 2 s
                                       ▼
-                        SQLite database -> Streamlit dashboard
+                     logs/monitor.db (SQLite: history, events, snapshot)
+                                      │ read-only, every 2 s
+                                      ▼
+                     Streamlit dashboard (dashboard/app.py), :8501
 ```
 
 ### Components
@@ -58,8 +66,9 @@ and install flow rules in response.
 |---|---|---|---|
 | Topology | `topology/` | System Python (sudo) | Mininet 3-tier tree: 7 switches, 12 hosts, monitor node, `TCLink` bandwidths. Writes `logs/topology.json` and starts the agents |
 | Telemetry agent | `agent/` | System Python inside each Mininet host | Sends CPU, memory and byte counters as JSON over UDP every 2 s |
-| Controller | `controller/` | `ryu-env` (Python 3.9) | Forwarding, telemetry receiver, port stats polling and utilization, heartbeat and utilization alerts, correlation + mitigation flow rules |
-| Dashboard | `dashboard/` | Own uv project (modern Python) | After D1: live view of nodes, link utilization, and alerts |
+| Controller | `controller/` | `ryu-env` (Python 3.9) | Forwarding, telemetry receiver, port stats polling and utilization, heartbeat / utilization / CPU / loss / link alerts, correlation + mitigation flow rules, SQLite writer (`monitor_db.py`) |
+| Dashboard | `dashboard/` | Own uv project (Python 3.13, Streamlit) | Live view of the topology, alerts, link utilization, nodes, CPU and the event log, read from `logs/monitor.db` |
+| Demo | `demo.sh`, `topology/demo.py` | Bash + system Python (sudo) | Starts everything and walks through 8 scenarios, checking each expected alert |
 | Server | `server/` | — | Unused for now (see [Design decisions](#design-decisions)) |
 
 ### Protocols used
@@ -68,7 +77,8 @@ and install flow rules in response.
 |---|---|---|
 | Agents → controller (telemetry) | **UDP** :9999 | Lightweight; occasional loss is acceptable and is itself measured via sequence numbers |
 | Controller ↔ switches | OpenFlow 1.3 over TCP :6653 | Required by OpenFlow; control messages must be reliable |
-| Dashboard | HTTP | Separate from the monitored network |
+| Controller → dashboard | SQLite file (`logs/monitor.db`) | No extra network channel; the dashboard can restart any time |
+| Dashboard → browser | HTTP :8501 | Separate from the monitored network |
 
 ---
 
@@ -124,6 +134,12 @@ direction's queue), so the monitor still hears every host during congestion.
 - Counters are totals so far; the controller computes rates from differences.
 - `app_tx_bytes` counts only what the agent itself sent (including headers), so
   the controller can tell application traffic apart from everything else.
+- `cpu_pct` is the CPU used by the processes inside that Mininet host, in % of
+  one core (100 = one core busy, like `top`). A Mininet host is only a network
+  namespace, so the usual `psutil.cpu_percent()` shows the whole machine, the
+  same on every host. The agent instead sums the CPU time (`/proc/<pid>/stat`)
+  of every process whose network namespace (`/proc/<pid>/ns/net`) is its own.
+- `mem_pct` is the whole machine's memory (namespaces don't split memory).
 - Gaps in `seq` → telemetry loss %. A lower `seq` with a newer timestamp means
   the agent restarted, and its counters are reset.
 - **Heartbeats:** every second the controller checks when each node last sent
@@ -146,32 +162,36 @@ utilization % = (Δbytes × 8) / (Δt × link_capacity_bps) × 100
   `TCLink` shaper charges the headers of every real packet. On s1-eth2 the
   counter was 4.2 % below the shaper's byte count.
 
-**Static thresholds** (warning / critical). D1 implements link utilization
-(both levels) and missed heartbeats (critical level only); the rest come later.
+**Static thresholds** (warning / critical):
 
-| Metric | Warning | Critical |
-|---|---|---|
-| Link utilization | 70 % | 90 % |
-| CPU | 80 % | 95 % |
-| App latency | 100 ms | 300 ms |
-| Telemetry loss | 5 % | 20 % |
-| Missed heartbeats | 2 | 3 |
-| New flows vs baseline | 2× | 5× |
+| Metric | Warning | Critical | Status |
+|---|---|---|---|
+| Link utilization (per direction) | 70 % | 90 % | ✅ |
+| Host CPU (% of one core) | 80 % | 95 % | ✅ |
+| Telemetry loss (last 30 s) | 5 % | 20 % | ✅ |
+| Missed heartbeats | – | 3 (6 s) | ✅ |
+| Link down (OpenFlow PortStatus) | – | any | ✅ |
+| App latency | 100 ms | 300 ms | Future work (needs echo probes) |
+| New flows vs baseline | 2× | 5× | Future work (needs flow stats) |
 
-Optional: dynamic thresholds using EWMA mean + 3σ.
+All alerts except `unreachable` and `link` have a 10 s cooldown (see below).
+Future work: dynamic thresholds using EWMA mean + 3σ.
 
 **Correlation rules:**
 
 | Condition | Diagnosis |
 |---|---|
-| High ingress rate on a host's switch port + low `app_tx_bytes` rate | Traffic not explained by the application → drop rule on that port, telemetry still allowed (D1, see below) |
-| High latency + high link utilization | Congestion |
-| High latency/CPU + normal utilization | Host problem |
-| No telemetry, but switch port still active | Agent failure |
-| No telemetry and no port traffic | Link/node failure |
+| High ingress rate on a host's switch port + low `app_tx_bytes` rate | Traffic not explained by the application → drop rule on that port, telemetry still allowed ✅ |
+| High CPU + quiet host link | Host problem, not the network ✅ (in the `cpu` alert text) |
+| High CPU + busy host link (≥ 30 %) | Load caused by network traffic ✅ |
+| No telemetry + a port on the host's path to the monitor is down | Link failure (names the link) ✅ |
+| No telemetry, path up, switch still receives traffic from the host | Agent failure (host alive) ✅ |
+| No telemetry, path up, no traffic from the host | Agent or host stopped ✅ |
+| High latency + high link utilization | Congestion — future work (needs latency) |
 
-**Alerts:** severity INFO / WARNING / CRITICAL, with de-duplication, cooldown,
-and "resolved" messages. D1 logs them to the console; file and SQLite come later.
+**Alerts:** severity WARNING / CRITICAL, with de-duplication, cooldown,
+and "resolved" messages. They go to the console and to the `events` table in
+SQLite (shown by the dashboard).
 Every alert is one log line starting with `ALERT`, so `grep ALERT` shows them all:
 ```
 ALERT CRITICAL unreachable h5: no telemetry for 6.4 s (3 intervals missed), last seq 57
@@ -243,6 +263,56 @@ ALERT RESOLVED unexplained h1: s4-eth1 rx ... (alert lasted ... s)
 MITIGATION h1: rules on s4-eth1 expired (hard_timeout 30 s), its traffic is forwarded normally again
 ```
 
+**Host alerts** (checked on every telemetry message):
+```
+ALERT CRITICAL cpu h5: cpu 99% of one core, host link quiet (0%): host problem, not the network
+ALERT CRITICAL loss h7: telemetry loss 27% over the last 30 s (4 of 15 messages lost)
+```
+- **CPU:** the alert text correlates the CPU with the host's own link: busy
+  link (≥ 30 %) → load from network traffic (e.g. a host serving a big download); quiet
+  link → a problem on the host itself.
+- **Loss** is counted over a sliding 30 s window, because the total since start
+  would never go back down. It needs at least 5 expected messages before it is
+  judged. Messages missed while a node is `unreachable` are that outage, already
+  alerted, so they are kept out of the window; otherwise every node that comes
+  back would immediately get a loss alert too.
+
+**Link status and failure diagnosis.** A switch sends an OpenFlow
+**PortStatus** message by itself whenever one of its ports goes up or down
+(e.g. `link s3 s7 down` in Mininet). The controller keeps the set of down ports:
+```
+ALERT CRITICAL link s3-s7: s7-eth4 is down (s7 <-> s3)
+ALERT RESOLVED link s3-s7: s3-eth2 is up again (alert lasted 20 s)
+```
+A link is named by its two ends in a fixed order, so both switches reporting
+the same link raise one alert; it resolves only when both ends are up. When a
+node goes silent, the `unreachable` alert now says why, by walking the host's
+path to the monitor (edge port, then each switch's port towards the monitor,
+from `topology.json`):
+```
+ALERT CRITICAL unreachable h10: no telemetry for 6.2 s (3 intervals missed), last seq 61, cause: link s3-s7 is down on its path to the monitor
+ALERT CRITICAL unreachable h8: no telemetry for 6.1 s (3 intervals missed), last seq 74, cause: agent failure: its link is up and the switch still sees 4.1 kbit/s from it
+```
+
+**Storage and dashboard.** A fourth green thread writes to `logs/monitor.db`
+(SQLite, `controller/monitor_db.py`) every 2 s, in one transaction:
+
+| Table | Content |
+|---|---|
+| `telemetry`, `link_util` | History: every telemetry message, every link direction's utilization (last 30 min kept) |
+| `events` | Every alert RAISED / CHANGED / RESOLVED and every MITIGATION action |
+| `nodes`, `active_alerts`, `mitigations`, `links` | Snapshot of "now", replaced on each write |
+
+Handling a packet never waits for the disk: telemetry and stats only append
+to lists in memory, and the writer flushes them. The file is recreated on
+every controller start and uses WAL mode, so the dashboard can read while the
+controller writes. The dashboard (`dashboard/app.py`, Streamlit) opens it
+read-only every 2 s and shows: summary numbers, the topology coloured by state
+(hosts by status, links by utilization, dashed red when down), active alerts and
+installed mitigation rules, link utilization and host CPU over time with the
+threshold lines, the per-node table and the event log. When the demo runs, a
+banner shows the current scenario.
+
 ---
 
 ## Setup
@@ -258,13 +328,52 @@ uv venv ryu-env --python 3.9
 source ryu-env/bin/activate
 uv pip install setuptools==67.6.1 wheel pbr
 uv pip install --no-build-isolation ryu eventlet==0.30.2
+
+# Dashboard environment (Python 3.13 + Streamlit, own uv project)
+cd dashboard && uv sync && cd ..
 ```
 
 ---
 
-## How to run
+## Demo
 
-Use two terminals. Start the controller first.
+One command starts the controller, the dashboard and the network, then walks
+through every scenario, pausing before each one so it can be explained:
+```bash
+./demo.sh               # as your normal user; it asks for sudo itself
+./demo.sh --auto        # no pauses: a full rehearsal in about 6 minutes
+```
+The dashboard opens at <http://localhost:8501>. For each scenario the terminal
+explains what is about to happen and what to look for, waits for Enter, causes
+the problem, prints the controller's alerts as they arrive (read from the same
+database the dashboard shows), and checks that the expected alert came: **PASS**
+or **CHECK**.
+
+| # | Scenario | What the demo does | Expected |
+|---|---|---|---|
+| 0 | Start-up | `pingall`, wait for the agents | 0 % dropped, 12/12 nodes reporting |
+| 1 | Baseline | 10 s of normal telemetry | no alerts |
+| 2 | Congestion | `iperf` h1 → h10 for 15 s (crosses the 10 Mbit/s s1–s3 link) | `CRITICAL utilization s1->s3` (~96 %), RESOLVED 10 s after |
+| 3 | Flood | `hping3 --flood` h1 → h3 | `CRITICAL unexplained h1`, 3 rules on s4, h2 → h3 at 30 Mbit/s 0 % loss; rules expire ≤ 30 s after |
+| 4 | CPU stress | busy loop on h5 for 15 s | `CRITICAL cpu h5 ... host problem`, then RESOLVED |
+| 5 | Lossy link | `netem` ~33 % loss on h7's interface (never two packets in a row) | `loss h7` WARNING/CRITICAL; RESOLVED once the window is clean |
+| 6 | Agent failure | h8 pings h9, its agent is killed, then restarted | `CRITICAL unreachable h8 ... cause: agent failure`, RESOLVED after restart |
+| 7 | Link failure | `link s3 s7 down`, then up | `CRITICAL link s3-s7`, h10–h12 unreachable with `cause: link s3-s7 is down`, all RESOLVED |
+
+At the end it prints a PASS/CHECK summary (10 checks, including the rule
+expiry and the loss recovery that finish in the background), opens the
+Mininet CLI for questions (`exit` to finish), stops everything and saves to
+`results/demo-<date>-<time>/`: `demo.log` (the terminal output), `controller.log`,
+`events.log` (every alert, one line each), `monitor.db`, the agent logs,
+`topology.json` and the iperf output.
+
+> `demo.sh` runs `sudo mn -c` before starting Ryu (it would kill a running
+> `ryu-manager`). To run only the scenarios against a controller you started
+> yourself: `sudo python3 topology/demo.py` (`--auto` for no pauses).
+
+## How to run (manually)
+
+Use two terminals (three with the dashboard). Start the controller first.
 
 **Terminal 1: controller**
 ```bash
@@ -277,6 +386,11 @@ ryu-manager --ofp-tcp-listen-port 6653 controller/monitor_app.py 2>&1 | grep -v 
 > this machine's own services, which the learning switch floods and never
 > installs rules for. To see only alerts and node events, filter with
 > `grep -E 'ALERT|restarted|new node'` instead.
+
+**Terminal 3 (optional): dashboard**
+```bash
+cd dashboard && uv run streamlit run app.py       # http://localhost:8501
+```
 
 **Terminal 2: network**
 ```bash
@@ -434,14 +548,14 @@ h1 → h3.
 | 2 | Custom topology with TCLink bandwidths and a bottleneck link (grown to a 3-tier tree, 12 hosts, on 17 Oct) | ✅ Done |
 | 3 | UDP agent + basic receiver | ✅ Done |
 | 4 | Agents on all hosts, per-node tracking, seq loss detection, heartbeat timeouts | ✅ Done |
-| 5 | Ryu port/flow stats polling | 🔄 Port stats done; flow stats later |
-| 6 | Utilization calculation + SQLite storage | 🔄 Utilization done; SQLite after D1 |
-| 7 | Static thresholds + alerting (cooldown, resolved) | 🔄 Link utilization + heartbeats done; CPU, loss, latency later |
-| 8 | Correlation rules + optional EWMA dynamic thresholds | 🔄 "Traffic not explained" rule + mitigation done; other rules and EWMA later |
-| 9 | Streamlit dashboard | ⬜ |
-| 10 | Test scenarios: baseline, iperf congestion, CPU stress, node failure, hping3 flood, TCLink loss | 🔄 Congestion, agent failure and flood done for D1; the rest later |
-| 11 | Report + README | ⬜ |
-| 12 | Full demo dry run, backup recording | ⬜ |
+| 5 | Ryu port/flow stats polling | ✅ Port stats + PortStatus (link up/down); flow stats left as future work |
+| 6 | Utilization calculation + SQLite storage | ✅ |
+| 7 | Static thresholds + alerting (cooldown, resolved) | ✅ Utilization, CPU, telemetry loss, heartbeats, link down; latency is future work |
+| 8 | Correlation rules + optional EWMA dynamic thresholds | ✅ Unexplained traffic + mitigation, CPU vs. link load, unreachable cause (link vs. agent); EWMA is future work |
+| 9 | Streamlit dashboard | ✅ |
+| 10 | Test scenarios: baseline, iperf congestion, CPU stress, node failure, hping3 flood, TCLink loss | ✅ All automated in `topology/demo.py`, plus link failure |
+| 11 | Report + README | 🔄 README done |
+| 12 | Full demo dry run, backup recording | ⬜ `./demo.sh --auto`, then record a run |
 
 ### Test scenarios (Day 10)
 
@@ -452,7 +566,8 @@ h1 → h3.
 | CPU stress | Stress process on one host | CPU + host problem |
 | Node failure | Kill an agent / bring a link down | Agent failure / link failure |
 | Flood | `hping3 --flood` from h1 | Traffic not explained by the application → drop rule |
-| Lossy link | `TCLink` with `loss=` | Telemetry loss |
+| Lossy link | `netem` loss on a host interface | Telemetry loss |
+| Link failure | `link s3 s7 down` | Link down + unreachable with cause |
 
 ---
 
@@ -462,7 +577,11 @@ h1 → h3.
   stats poller and the heartbeat checker are green threads (`hub.spawn`) in
   `monitor_app.py`, so there is one fewer process and no second channel between
   server and controller.
-  `server/` is unused for now.
+  `server/` is unused.
+- **The database is the only link to the dashboard.** The controller never
+  waits for the dashboard and the dashboard never talks to the controller, so
+  either can be restarted alone. WAL mode lets one writer and readers work at
+  the same time.
 - **No hardcoded maps.** Port numbers, capacities and host locations come from
   `logs/topology.json`, re-read whenever a switch connects (Mininet rewrites it
   on every start, after Ryu is already running).
@@ -479,14 +598,17 @@ CN-MiniProject/
 ├── agent/
 │   └── agent.py          # UDP telemetry agent (runs in each Mininet host)
 ├── controller/
-│   └── monitor_app.py    # Ryu app: forwarding + telemetry + port stats + alerts + mitigation
+│   ├── monitor_app.py    # Ryu app: forwarding + telemetry + port stats + alerts + mitigation
+│   └── monitor_db.py     # SQLite writer used by monitor_app.py
 ├── topology/
 │   ├── topology.py       # Mininet tree, monitor node, topology.json, agents
-│   └── flood_test.py     # automated test 5 (flood -> mitigation), writes results/d1-flood/
-├── dashboard/            # Streamlit app (after D1)
+│   ├── flood_test.py     # automated test 5 (flood -> mitigation), writes results/d1-flood/
+│   └── demo.py           # guided demo of all scenarios with PASS/CHECK (run by demo.sh)
+├── dashboard/            # Streamlit dashboard: app.py + its own uv project
+├── demo.sh               # one command: controller + dashboard + guided demo
 ├── server/               # unused for now
-├── logs/                 # gitignored: topology.json, agent-hN.log
-├── results/              # saved test runs (D1 rehearsal)
+├── logs/                 # gitignored: topology.json, agent-hN.log, monitor.db
+├── results/              # saved test runs (D1 rehearsal tracked; demo runs stay local)
 ├── ryu-env/              # gitignored
 ├── README.md             # this file
 ├── README2.md            # work log, 3 Oct
